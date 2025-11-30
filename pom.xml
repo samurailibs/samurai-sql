@@ -10,9 +10,9 @@
   <name>dao</name>
   <version>1.3.0</version>
 <!--
-  <version>1.2.0-RC5</version>
-  <version>1.2.0</version>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.3.0-RC5</version>
+  <version>1.3.0</version>
+  <version>1.3.0-SNAPSHOT</version>
 -->
   <description>samurai-dao is a simple, high performance object/relational persistence and query service.</description>
   <url>https://github.com/samurailibs/samurai-dao/</url>

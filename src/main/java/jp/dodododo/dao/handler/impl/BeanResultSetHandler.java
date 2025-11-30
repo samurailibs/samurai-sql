@@ -52,7 +52,6 @@ import jp.dodododo.dao.util.DaoUtil;
 import jp.dodododo.dao.util.EmptyUtil;
 import jp.dodododo.dao.util.OgnlUtil;
 import jp.dodododo.dao.util.StringUtil;
-import jp.dodododo.dao.util.Sun14ReflectionUtil;
 import jp.dodododo.dao.util.TypesUtil;
 import jp.dodododo.dao.util.ZoneUtil;
 
@@ -828,15 +827,6 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 			}
 		}
 
-		try {
-			if (Sun14ReflectionUtil.canUse() == true) {
-				Constructor<T> constructor = Sun14ReflectionUtil.getMungedConstructor(beanClass);
-				logger.warn(beanClass.getName() + " use the munged constructor !");
-				logger.trace("used constructor [" + constructor + "]");
-				return constructor;
-			}
-		} catch (Throwable ignore) {
-		}
 		throw new RuntimeException("ConstructorNotFoundException at " + targetClass);
 	}
 
