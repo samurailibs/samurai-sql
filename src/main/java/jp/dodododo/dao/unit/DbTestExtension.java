@@ -17,9 +17,11 @@ import jp.dodododo.dao.error.SQLError;
 import jp.dodododo.dao.util.ClassUtil;
 import jp.dodododo.dao.wrapper.ConnectionWrapper;
 
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class DbTestRule extends ExternalResource {
+public class DbTestExtension implements BeforeEachCallback, AfterEachCallback {
 
 	protected DBConfig config;
 
@@ -29,28 +31,27 @@ public class DbTestRule extends ExternalResource {
 
 	protected Driver driver;
 
-	public DbTestRule() {
+	public DbTestExtension() {
 		Properties properties = new Properties();
-		try (InputStream in = DbTestRule.class.getResourceAsStream("/db.properties")) {
+		try (InputStream in = DbTestExtension.class.getResourceAsStream("/db.properties")) {
 			properties.load(in);
-			DBConfig config = ClassUtil.newInstance(properties.getProperty("config"));
-			this.config = config;
+			this.config = ClassUtil.newInstance(properties.getProperty("config"));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
-	public DbTestRule(DBConfig config) {
+	public DbTestExtension(DBConfig config) {
 		this.config = config;
 	}
 
 	@Override
-	protected void before() throws Throwable {
+	public void beforeEach(ExtensionContext context) throws Exception {
 		Enumeration<Driver> drivers = DriverManager.getDrivers();
-		for (; drivers.hasMoreElements();) {
-			DriverManager.deregisterDriver(drivers.nextElement());
-		}
-		driver = ClassUtil.newInstance(config.driverClassName());
+        while (drivers.hasMoreElements()) {
+            DriverManager.deregisterDriver(drivers.nextElement());
+        }
+        driver = ClassUtil.newInstance(config.driverClassName());
 		DriverManager.registerDriver(driver);
 		this.connection = newConnection();
 		final Connection connection = this.connection;
@@ -77,7 +78,7 @@ public class DbTestRule extends ExternalResource {
 	}
 
 	@Override
-	protected void after() {
+	public void afterEach(ExtensionContext context) throws Exception {
 		try {
 			getConnection().rollback();
 			this.connection.close();
@@ -105,5 +106,4 @@ public class DbTestRule extends ExternalResource {
 	public DataSource getDataSource() {
 		return dataSource;
 	}
-
 }

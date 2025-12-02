@@ -1,6 +1,8 @@
 package jp.dodododo.dao.impl;
 
 import static jp.dodododo.dao.commons.Bool.*;
+
+import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.annotation.Property;
 
@@ -12,28 +14,28 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class EmpConstructorHasDept {
 	private String EMPNO;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String ENAME;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String JOB;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String MGR;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String HIREDATE;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String SAL;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String COMM;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String DEPTNO;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String TSTAMP;
 
 	private Dept dept;

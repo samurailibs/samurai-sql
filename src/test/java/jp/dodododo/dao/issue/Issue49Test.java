@@ -7,21 +7,21 @@ import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.annotation.Arg;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.annotation.Table;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue49Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
 	@Test
 	public void test() throws Exception {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 
 		Emp1 emp1 = dao.selectOne(Emp1.class, from("emp"), by("empno", 7369, "argname", "a")).get();
 		assertEquals(7369, emp1.empno);

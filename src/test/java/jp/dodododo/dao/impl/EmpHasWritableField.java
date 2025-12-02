@@ -1,6 +1,8 @@
 package jp.dodododo.dao.impl;
 
 import static jp.dodododo.dao.commons.Bool.*;
+
+import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.annotation.Property;
 
@@ -12,7 +14,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class EmpHasWritableField {
 	private String EMPNO;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String ENAME;
 
 	private String JOB;
@@ -27,7 +29,7 @@ public class EmpHasWritableField {
 
 	private String DEPTNO;
 
-	@Property(writable = TRUE)
+	@Property(AccessMode.WRITE_ONLY)
 	private String TSTAMP;
 
 	public EmpHasWritableField(@Column("EMPNO") String EMPNO) {

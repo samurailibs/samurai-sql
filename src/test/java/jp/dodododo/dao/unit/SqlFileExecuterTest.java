@@ -2,13 +2,13 @@ package jp.dodododo.dao.unit;
 
 import java.sql.Connection;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class SqlFileExecuterTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	@Test
 	public void testExecuteSelect() {
@@ -28,6 +28,6 @@ public class SqlFileExecuterTest {
 	}
 
 	private Connection getConnection() {
-		return dbTestRule.getConnection();
+		return dbTestExtension.getConnection();
 	}
 }

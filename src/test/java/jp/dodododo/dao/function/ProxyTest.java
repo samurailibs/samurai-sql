@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import jp.dodododo.dao.Dao;
+import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Bean;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.annotation.Id;
@@ -22,21 +23,21 @@ import jp.dodododo.dao.impl.Dept;
 import jp.dodododo.dao.lazyloading.LazyLoadingProxy;
 import jp.dodododo.dao.log.SqlLogRegistry;
 import jp.dodododo.dao.types.TypeConverter;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class ProxyTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 		DeptProxy.dao = dao;
 		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
 
@@ -56,7 +57,7 @@ public class ProxyTest {
 		String sql = "select DEPT.deptno as DEPTNO, ename, comm, tstamp, EMPNO from EMP, DEPT where EMP.deptno = DEPT.deptno and empno = " + empNo;
 		List<Emp> select = dao.select(sql, Emp.class);
 		assertEquals(empNo, select.get(0).EMPNO);
-		assertEquals(new Integer(2), TypeConverter.convert(select.get(0).COMM, Integer.class));
+		assertEquals(Integer.valueOf(2), TypeConverter.convert(select.get(0).COMM, Integer.class));
 		assertEquals("ename", select.get(0).NAME);
 		assertNotNull(select.get(0).TSTAMP);
 
@@ -67,9 +68,9 @@ public class ProxyTest {
 	}
 
 	public static class Emp {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) }, targetTables = { "emp" })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) }, targetTables = { "emp" })
 		public String EMPNO;
 
 		@Column("ename")
@@ -88,7 +89,7 @@ public class ProxyTest {
 
 		public String COMM;
 
-		@Property(readable = TRUE)
+		@Property(AccessMode.READ_ONLY)
 		private Dept dept;
 
 		public Emp() {

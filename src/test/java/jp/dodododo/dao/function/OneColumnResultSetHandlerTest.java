@@ -13,22 +13,21 @@ import jp.dodododo.dao.annotation.Id;
 import jp.dodododo.dao.annotation.IdDefSet;
 import jp.dodododo.dao.exception.UnsupportedTypeException;
 import jp.dodododo.dao.id.Sequence;
-import jp.dodododo.dao.log.SqlLogRegistry;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class OneColumnResultSetHandlerTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 
 		List<String> resultStringList = dao.select("SELECT ename FROM EMP ORDER BY empno", String.class);
 		assertEquals("SMITH", resultStringList.get(0));
@@ -37,7 +36,7 @@ public class OneColumnResultSetHandlerTest {
 		assertEquals(800, (int) resultIntegerList.get(0));
 
 		List<Integer> resultBigDecimalList = dao.select("SELECT sal FROM EMP ORDER BY empno", Integer.class);
-		assertEquals(new Integer("800"), resultBigDecimalList.get(0));
+		assertEquals(Integer.valueOf("800"), resultBigDecimalList.get(0));
 
 		@SuppressWarnings("rawtypes")
 		List<Map> resultMapList = dao.select("SELECT * FROM EMP ORDER BY empno", Map.class);
@@ -75,7 +74,7 @@ public class OneColumnResultSetHandlerTest {
 	}
 
 	public static class Empno {
-		@Id(value = @IdDefSet(type = Sequence.class, name = "sequence"), targetTables = { "emp" })
+		@Id(value = @IdDefSet(strategy = Sequence.class, name = "sequence"), targetTables = { "emp" })
 		public String EMPNO;
 	}
 

@@ -1,10 +1,6 @@
 package jp.dodododo.dao.util;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -63,7 +59,9 @@ public abstract class ConnectionUtil {
 
 	public static PreparedStatement prepareStatement(Connection connection, String sql) {
 		try {
-			return connection.prepareStatement(sql);
+			// RETURN_GENERATED_KEYS is harmless for non-INSERT statements.
+			// It simply returns an empty ResultSet when no keys are generated.
+			return connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		} catch (SQLException e) {
 			throw new SQLRuntimeException(sql, e);
 		}

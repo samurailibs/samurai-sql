@@ -1,10 +1,13 @@
 package jp.dodododo.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import jp.dodododo.dao.exception.SQLRuntimeException;
+import jp.dodododo.dao.impl.RdbDao;
 import jp.dodododo.dao.sql.Sql;
 
 public interface ExecuteUpdateDao {

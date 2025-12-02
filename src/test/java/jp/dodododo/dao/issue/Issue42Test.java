@@ -20,16 +20,16 @@ import jp.dodododo.dao.dialect.MySQL;
 import jp.dodododo.dao.dialect.sqlite.SQLite;
 import jp.dodododo.dao.id.Identity;
 import jp.dodododo.dao.id.Sequence;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue42Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
@@ -66,7 +66,7 @@ public class Issue42Test {
 	}
 
 	public static class Emp {
-		@Id({ @IdDefSet(type = Sequence.class, name = "sequence"), @IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id({ @IdDefSet(strategy = Sequence.class, name = "sequence"), @IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public String empno;
 
 		@Timestamp
@@ -86,10 +86,10 @@ public class Issue42Test {
 	}
 
 	private DataSource getDataSource() {
-		return dbTestRule.getDataSource();
+		return dbTestExtension.getDataSource();
 	}
 
 	private Connection getConnection() {
-		return dbTestRule.getConnection();
+		return dbTestExtension.getConnection();
 	}
 }

@@ -11,27 +11,27 @@ import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.config.DaoConfig;
 import jp.dodododo.dao.row.Row;
 import jp.dodododo.dao.types.TypeConverter;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue10Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
 	}
 
 	@Test
 	public void test() throws ParseException {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 		EMP emp = new EMP();
 		emp.EMPNO = "1";
 		emp.HIREDATE = "2000-02-02";

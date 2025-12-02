@@ -35,9 +35,25 @@ public abstract class ResultSetUtil {
 		}
 	}
 
+	public static Object getObject(ResultSet rs, int index) {
+		try {
+			return rs.getObject(index);
+		} catch (SQLException e) {
+			throw new SQLError(e);
+		}
+	}
+
 	public static Object getObject(ResultSet rs, String columnLabel) {
 		try {
 			return rs.getObject(columnLabel);
+		} catch (SQLException e) {
+			throw new SQLError(e);
+		}
+	}
+
+	public static boolean next(ResultSet rs) {
+		try {
+			return rs.next();
 		} catch (SQLException e) {
 			throw new SQLError(e);
 		}

@@ -4,21 +4,21 @@ import static jp.dodododo.dao.unit.UnitTestUtil.*;
 import static org.junit.Assert.*;
 import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.annotation.Column;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue7Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
 	@Test
 	public void test() {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 		Emp emp = new Emp();
 		int count = dao.insert(emp);
 		assertEquals(1, count);

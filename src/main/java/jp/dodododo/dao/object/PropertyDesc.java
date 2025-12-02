@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Bean;
 import jp.dodododo.dao.annotation.Internal;
 import jp.dodododo.dao.annotation.Property;
+import jp.dodododo.dao.commons.Bool;
 import jp.dodododo.dao.exception.IllegalPropertyRuntimeException;
 import jp.dodododo.dao.message.Message;
 import jp.dodododo.dao.object.aop.field.FieldAccess;
@@ -119,8 +121,9 @@ public class PropertyDesc implements AnnotatedElement {
 	private void setupReadableWritable(Field field) {
 		Property p = field.getAnnotation(Property.class);
 		if (p != null) {
-			this.readable = p.readable().toBoolean(false);
-			this.writable = p.writable().toBoolean(false);
+			AccessMode accessMode = p.value();
+			this.readable = accessMode.isReadable();
+			this.writable = accessMode.isWriteable();
 			if (this.writable || this.readable) {
 				field.setAccessible(true);
 			}
@@ -618,8 +621,9 @@ public class PropertyDesc implements AnnotatedElement {
 		if (p == null) {
 			return;
 		}
-		this.readable = p.readable().toBoolean(this.readable);
-		this.writable = p.writable().toBoolean(this.writable);
+		AccessMode accessMode = p.value();
+		this.readable = accessMode.isReadable();
+		this.writable = accessMode.isWriteable();
 		this.ignoreExceptions.addAll(Arrays.asList(p.ignoreExceptions()));
 	}
 
@@ -631,7 +635,7 @@ public class PropertyDesc implements AnnotatedElement {
 		if (p == null) {
 			return;
 		}
-		this.writable = p.writable().toBoolean(this.writable);
+		this.writable = p.value().isWriteable();
 		this.ignoreExceptions.addAll(Arrays.asList(p.ignoreExceptions()));
 	}
 
@@ -643,7 +647,7 @@ public class PropertyDesc implements AnnotatedElement {
 		if (p == null) {
 			return;
 		}
-		this.readable = p.readable().toBoolean(this.readable);
+		this.readable = p.value().isReadable();
 		this.ignoreExceptions.addAll(Arrays.asList(p.ignoreExceptions()));
 	}
 

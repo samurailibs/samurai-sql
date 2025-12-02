@@ -10,17 +10,16 @@ import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.annotation.Bean;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.config.DaoConfig;
-import jp.dodododo.dao.log.SqlLogRegistry;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue35Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
@@ -31,7 +30,7 @@ public class Issue35Test {
 
 	@Test
 	public void test() throws ParseException {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 
 		Emp emp = dao.selectOne("select * from EMP where empno = 7369", Emp.class).get();
 		assertNotNull(emp.dept);
@@ -95,7 +94,7 @@ public class Issue35Test {
 
 	@Test
 	public void testPrimitiveArgs() {
-		Dao dao = newTestDao(dbTestRule.getConnection());
+		Dao dao = newTestDao(dbTestExtension.getConnection());
 		List<PrimitiveArgsEmp> list = dao.select("select * from EMP where comm > 0", PrimitiveArgsEmp.class);
 		assertTrue(list.isEmpty() == false);
 		for (PrimitiveArgsEmp emp : list) {

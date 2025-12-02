@@ -6,6 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.commons.Bool;
 
 /**
@@ -16,9 +17,7 @@ import jp.dodododo.dao.commons.Bool;
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Property {
-	Bool readable() default Bool.UNDEFINED;
-
-	Bool writable() default Bool.UNDEFINED;
+	AccessMode value() default AccessMode.READ_WRITE;
 
 	Class<? extends Throwable>[] ignoreExceptions() default {};
 }

@@ -5,7 +5,7 @@ import jp.dodododo.dao.dialect.Default;
 import jp.dodododo.dao.id.IdGenerator;
 
 public @interface IdDefSet {
-	Class<? extends IdGenerator> type();
+	Class<? extends IdGenerator> strategy();
 
 	String name() default "";
 

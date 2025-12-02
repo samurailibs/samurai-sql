@@ -8,16 +8,15 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import jp.dodododo.dao.Dao;
-import jp.dodododo.dao.log.SqlLogRegistry;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class HasListOfIntPropertyTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
@@ -40,6 +39,6 @@ public class HasListOfIntPropertyTest {
 	}
 
 	private DataSource getDataSource() {
-		return dbTestRule.getDataSource();
+		return dbTestExtension.getDataSource();
 	}
 }

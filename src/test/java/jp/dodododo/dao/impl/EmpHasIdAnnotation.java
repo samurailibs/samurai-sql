@@ -31,7 +31,7 @@ public class EmpHasIdAnnotation {
 
 	private String TSTAMP;
 
-	@Id( { @IdDefSet(type = Sequence.class, name = "sequence", db = HSQL.class) })
+	@Id( { @IdDefSet(strategy = Sequence.class, name = "sequence", db = HSQL.class) })
 	public void setEMPNO(String empno) {
 		EMPNO = empno;
 	}

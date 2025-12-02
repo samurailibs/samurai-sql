@@ -11,4 +11,9 @@ public class PostgreSQL extends Standard {
 	public String sequenceNextValSql(String sequenceName) {
 		return "select nextval ('" + sequenceName + "')";
 	}
+
+	@Override
+	public TableNameResolver getTableNameResolver() {
+		return StrictTableNameResolver.INSTANCE;
+	}
 }

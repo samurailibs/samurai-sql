@@ -14,6 +14,7 @@ import java.util.zip.InflaterInputStream;
 import javax.sql.DataSource;
 
 import jp.dodododo.dao.Dao;
+import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.annotation.Compress;
 import jp.dodododo.dao.annotation.Id;
@@ -28,18 +29,17 @@ import jp.dodododo.dao.dialect.MySQL;
 import jp.dodododo.dao.dialect.sqlite.SQLite;
 import jp.dodododo.dao.id.Identity;
 import jp.dodododo.dao.id.Sequence;
-import jp.dodododo.dao.log.SqlLogRegistry;
 import jp.dodododo.dao.row.Row;
 import jp.dodododo.dao.types.TypeConverter;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class CompressTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 
 	private Dao dao;
@@ -62,7 +62,7 @@ public class CompressTest {
 	}
 
 	private DataSource getDataSource() {
-		return dbTestRule.getDataSource();
+		return dbTestExtension.getDataSource();
 	}
 
 	private Connection getConnection() throws SQLException {
@@ -71,9 +71,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class NoCompress {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
 	}
@@ -97,9 +97,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class GZIPCompress {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.GZIP)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -124,9 +124,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ZLIB_BEST_COMPRESSION {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.ZLIB_BEST_COMPRESSION)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -151,9 +151,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ZLIB_BEST_SPEED {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class), })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class), })
 		public long id;
 		@Compress(compressType = CompressType.ZLIB_BEST_SPEED)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -178,9 +178,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ZLIB_DEFAULT_COMPRESSION {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.ZLIB_DEFAULT_COMPRESSION)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -205,9 +205,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ZLIB_DEFAULT_STRATEGY {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.ZLIB_DEFAULT_STRATEGY)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -232,9 +232,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ZLIB_DEFLATED {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.ZLIB_DEFLATED)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -259,9 +259,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ZLIB_FILTERED {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.ZLIB_FILTERED)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -286,9 +286,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ZLIB_HUFFMAN_ONLY {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.ZLIB_HUFFMAN_ONLY)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -316,9 +316,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ZLIB_NO_COMPRESSION {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.ZLIB_NO_COMPRESSION)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -343,9 +343,9 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class GZIPCompressNoAutoUncompress {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		public long id;
 		@Compress(compressType = CompressType.GZIP, autoUncompress = false)
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
@@ -370,10 +370,10 @@ public class CompressTest {
 
 	@Table("BINARY_TABLE")
 	public static class ConstructorArgHasCompress {
-		@Property(writable = Bool.TRUE)
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) })
+		@Property
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) })
 		private int id;
 
 		@Compress

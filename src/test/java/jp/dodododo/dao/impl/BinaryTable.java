@@ -26,7 +26,7 @@ public class BinaryTable {
 		return id;
 	}
 
-	@Id( { @IdDefSet(type = Sequence.class, name = "sequence", db = HSQL.class) })
+	@Id( { @IdDefSet(strategy = Sequence.class, name = "sequence", db = HSQL.class) })
 	public void setId(int id) {
 		this.id = id;
 	}

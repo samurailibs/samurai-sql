@@ -27,19 +27,20 @@ import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.annotation.Table;
 import jp.dodododo.dao.annotation.Zone;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
 
 public class TimeTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
@@ -244,6 +245,6 @@ public class TimeTest {
 	}
 
 	private DataSource getDataSource() {
-		return dbTestRule.getDataSource();
+		return dbTestExtension.getDataSource();
 	}
 }

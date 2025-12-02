@@ -7,21 +7,21 @@ import jp.dodododo.dao.annotation.Table;
 import jp.dodododo.dao.exception.SQLRuntimeException;
 import jp.dodododo.dao.impl.Dept;
 import jp.dodododo.dao.impl.Emp;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue4Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
 	@Test
 	public void test() {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 		RootEntity rootEntity = new RootEntity();
 		rootEntity.emp.setCOMM("2");
 		rootEntity.emp.setDEPTNO("10");

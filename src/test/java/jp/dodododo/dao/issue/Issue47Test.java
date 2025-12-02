@@ -11,21 +11,21 @@ import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.annotation.Bean;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.row.Row;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue47Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
 	@Test
 	public void test() throws Exception {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 
 		List<Emp> empList = dao.select(ALL, Emp.class);
 		for (Emp emp : empList) {

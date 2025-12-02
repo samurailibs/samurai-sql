@@ -11,17 +11,17 @@ import jp.dodododo.dao.annotation.NumKey;
 import jp.dodododo.dao.annotation.StringKey;
 import jp.dodododo.dao.config.DaoConfig;
 import jp.dodododo.dao.types.JavaTypes.EnumType;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 import jp.dodododo.dao.util.EnumConverter;
 
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue12Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	@Before
 	public void setUp() throws Exception {
@@ -30,7 +30,7 @@ public class Issue12Test {
 
 	@Test
 	public void test() throws Exception {
-		Connection connection = dbTestRule.getConnection();
+		Connection connection = dbTestExtension.getConnection();
 		test(connection, Emp.SMITH);
 		test(connection, Emp.ALLEN);
 		connection.close();

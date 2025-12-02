@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Property;
 import jp.dodododo.dao.exception.FailLazyLoadException;
 import jp.dodododo.dao.exception.IllegalPropertyRuntimeException;
@@ -82,17 +83,17 @@ public class PropertyDescTest {
 
 		public List<String> property2;
 
-		@Property(readable = TRUE)
+		@Property(AccessMode.WRITE_ONLY)
 		private List<String> property3;
 
-		@Property(writable = TRUE)
+		@Property(AccessMode.WRITE_ONLY)
 		private List<String> property4;
 
 		private List<String> property5;
 
 		private List<String> property6;
 
-		@Property(writable = FALSE, readable = FALSE)
+		@Property(AccessMode.IGNORE)
 		private List<String> property7;
 
 		@Property()

@@ -4,23 +4,22 @@ import static jp.dodododo.dao.unit.UnitTestUtil.*;
 import static jp.dodododo.dao.util.DaoUtil.*;
 import static org.junit.Assert.*;
 import jp.dodododo.dao.Dao;
-import jp.dodododo.dao.log.SqlLogRegistry;
 import jp.dodododo.dao.types.TypeConverter;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class InsertObjectAndMap {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 
 		assertFalse(dao.exists(new Emp(1)));
 		assertFalse(dao.exists(new Emp(2)));

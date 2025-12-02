@@ -18,17 +18,16 @@ import jp.dodododo.dao.dialect.DialectManager;
 import jp.dodododo.dao.dialect.MySQL;
 import jp.dodododo.dao.dialect.sqlite.SQLite;
 import jp.dodododo.dao.impl.Emp;
-import jp.dodododo.dao.log.SqlLogRegistry;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 import jp.dodododo.dao.value.ParameterValue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class GenericSqlTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
@@ -210,6 +209,6 @@ public class GenericSqlTest {
 	}
 
 	private DataSource getDataSource() {
-		return dbTestRule.getDataSource();
+		return dbTestExtension.getDataSource();
 	}
 }

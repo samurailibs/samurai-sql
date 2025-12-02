@@ -1,6 +1,7 @@
 package jp.dodododo.dao.id;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -14,14 +15,7 @@ public enum Sequence implements IdGenerator {
 	SEQUENCE;
 
     @Override
-	public Object generate(Connection connection, String sequenceName) {
-		Dialect dialect = DialectManager.getDialect(connection);
-		return generate(connection, dialect, sequenceName);
-
-	}
-
-    @Override
-	public Object generate(Connection connection, Dialect dialect, String sequenceName) {
+	public Object generate(Connection connection, PreparedStatement ps, Dialect dialect, String sequenceName) {
 		String sql = dialect.sequenceNextValSql(sequenceName);
 		Dao dao = new RdbDao(connection);
 		Optional<Map<String, Object>> result = dao.selectOneMap(sql);
@@ -30,12 +24,7 @@ public enum Sequence implements IdGenerator {
 	}
 
     @Override
-	public boolean isPrepare(Connection connection) {
-		return true;
-	}
-
-    @Override
-	public boolean isPrepare(Dialect dialect) {
+	public boolean generateBeforeInsert(Dialect dialect) {
 		return true;
 	}
 

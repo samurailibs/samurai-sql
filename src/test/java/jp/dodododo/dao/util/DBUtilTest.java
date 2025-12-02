@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import jp.dodododo.dao.metadata.TableMetaData;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class DBUtilTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	@Test
 	public void testGetTableNames() throws Exception {
@@ -44,6 +44,6 @@ public class DBUtilTest {
 	}
 
 	private Connection getConnection() {
-		return dbTestRule.getConnection();
+		return dbTestExtension.getConnection();
 	}
 }

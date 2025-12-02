@@ -72,4 +72,12 @@ public abstract class PreparedStatementUtil extends StatementUtil {
 		}
 	}
 
+	public static ResultSet getGeneratedKeys(PreparedStatement ps, SqlLogRegistry sqlLogRegistry) {
+		try {
+			return ps.getGeneratedKeys();
+		} catch (SQLException e) {
+			throw new SQLRuntimeException(sqlLogRegistry.getLast().getCompleteSql(), e);
+		}
+	}
+
 }

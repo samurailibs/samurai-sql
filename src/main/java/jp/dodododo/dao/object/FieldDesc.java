@@ -4,7 +4,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
+import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Property;
+import jp.dodododo.dao.commons.Bool;
 import jp.dodododo.dao.exception.IllegalFieldRuntimeException;
 import jp.dodododo.dao.util.FieldUtil;
 
@@ -47,8 +49,9 @@ public class FieldDesc {
 	private void setupReadableWritable(Field field) {
 		Property p = field.getAnnotation(Property.class);
 		if (p != null) {
-			this.readable = p.readable().toBoolean(false);
-			this.writable = p.writable().toBoolean(false);
+			AccessMode accessMode = p.value();
+			this.readable = accessMode.isReadable();
+			this.writable = accessMode.isWriteable();
 			if (this.writable || this.readable) {
 				field.setAccessible(true);
 			}

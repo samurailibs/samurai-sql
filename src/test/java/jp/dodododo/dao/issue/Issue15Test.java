@@ -9,17 +9,16 @@ import java.text.ParseException;
 import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.config.DaoConfig;
 import jp.dodododo.dao.exception.DaoRuntimeException;
-import jp.dodododo.dao.log.SqlLogRegistry;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class Issue15Test {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
@@ -30,7 +29,7 @@ public class Issue15Test {
 
 	@Test
 	public void test() throws ParseException {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 
 		try {
 			dao.update("EMP", map("ename", "mike"));

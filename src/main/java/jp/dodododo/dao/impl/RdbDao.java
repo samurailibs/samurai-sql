@@ -10,10 +10,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,6 +54,7 @@ import jp.dodododo.dao.exception.SQLRuntimeException;
 import jp.dodododo.dao.function.ConsumerWrapper;
 import jp.dodododo.dao.handler.ResultSetHandler;
 import jp.dodododo.dao.handler.factory.ResultSetHandlerFactory;
+import jp.dodododo.dao.id.GeneratedValue;
 import jp.dodododo.dao.id.IdGenerator;
 import jp.dodododo.dao.id.Identity;
 import jp.dodododo.dao.lazyloading.LazyLoadingUtil;
@@ -184,7 +182,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 		};
 		this.dataSource = new DataSourceImpl() {
 			@Override
-			public Connection getConnection() throws SQLException {
+			public Connection getConnection() {
 				return connectionWrapper;
 			}
 		};
@@ -206,7 +204,32 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public int insert(String tableName, Object... entity) {
-		return insert(tableName, entity[0], null, null, OPTIMISTIC_LOCKING, entity);
+		ObjectDesc<Object> desc =ObjectDescFactory.getObjectDesc(entity[0]);
+		TableMetaData tableMetaData = getTableMetaData(DaoUtil.getTableName(desc.getTargetClass()));
+		List<PropertyDesc> propertyDescs = desc.getPropertyDescs();
+		List<String> npc= new ArrayList<>();
+		Dialect dialect = DialectManager.getDialect(dataSource);
+		for (PropertyDesc pd :propertyDescs ) {
+			Id id = pd.getAnnotation(Id.class);
+			if (id == null) {
+				continue;
+			}
+
+			for (IdDefSet idDefSet : id.value()) {
+				Class<? extends IdGenerator> strategy = idDefSet.strategy();
+				Class<? extends Dialect> db = idDefSet.db();
+				if (db == null) {
+				} else if (db.isInstance(dialect) == false) {
+					continue;
+				}
+				if (GeneratedValue.class.equals(strategy)) {
+					ColumnMetaData columnMetaData = tableMetaData.getColumnMetaData(pd.getPropertyName());
+					npc.add(columnMetaData.getColumnName());
+				}
+			}
+
+		}
+		return insert(tableName, entity[0], null, npc, OPTIMISTIC_LOCKING, entity);
 	}
 
     @Override
@@ -248,7 +271,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 			return ret;
 		}
 
-		if (ALL_TABLE_NAMES_CACHE.isEmpty() == true) {
+		if (ALL_TABLE_NAMES_CACHE.isEmpty()) {
 			Map<String, String> tableNames = DBUtil.getTableNames(connection);
 			ALL_TABLE_NAMES_CACHE.putAll(tableNames);
 		}
@@ -322,7 +345,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 				sql = getSql(sql, dialect);
 			}
 			LimitOffset limitOffset = null;
-			if (arg != null && arg.containsKey(LimitOffset.KEYWORD) == true) {
+			if (arg != null && arg.containsKey(LimitOffset.KEYWORD)) {
 				limitOffset = (LimitOffset) arg.get(LimitOffset.KEYWORD);
 				try {
 					sql = dialect.limitOffsetSql(sql, limitOffset);
@@ -331,7 +354,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 				}
 			}
 			Map<String, ParameterValue> values = createParameterValues(arg);
-			if (isDynamic == true) {
+			if (isDynamic) {
 				ps = createPreparedStatement(connection, sql, values, ExecuteType.QUERY, dialect, null);
 			} else {
 				logSql(sql, null, null, dialect, ExecuteType.QUERY);
@@ -664,7 +687,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 			}
 			int[] counts = PreparedStatementUtil.executeBatch(ps, sqlLogRegistry);
 			if (entities.size() == 1) {
-				setIds(tableName, entity, connection, !PREPARE);
+				setIds(tableName, entity, connection, ps, !PREPARE);
 			}
 			return counts;
 		} finally {
@@ -678,7 +701,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 	}
 
 	protected <ENTITY> void prepareInsert(String tableName, ENTITY entity, Locking locking, Connection connection) {
-		setIds(tableName, entity, connection, PREPARE);
+		setIds(tableName, entity, connection, null, PREPARE);
 		if (locking == OPTIMISTIC_LOCKING) {
 			setVersionNos(tableName, entity, true);
 			setTimestamps(tableName, entity);
@@ -720,15 +743,15 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 		}
 	}
 
-	protected <ENTITY> boolean setIds(String tableName, ENTITY entity, Connection connection, boolean isPrepare) {
+	protected <ENTITY> boolean setIds(String tableName, ENTITY entity, Connection connection, PreparedStatement ps, boolean isPrepare) {
 		if (entity == null) {
 			return false;
 		}
 		Map<Integer, Object> processedObjects = new HashMap<>();
-		return setIds(tableName, entity, connection, isPrepare, processedObjects);
+		return setIds(tableName, entity, connection, ps, isPrepare, processedObjects);
 	}
 
-	protected <ENTITY> boolean setIds(String tableName, ENTITY entity, Connection connection, boolean isPrepare, Map<Integer, Object> processedObjects) {
+	protected <ENTITY> boolean setIds(String tableName, ENTITY entity, Connection connection, PreparedStatement ps, boolean isPrepare, Map<Integer, Object> processedObjects) {
 		if (entity == null) {
 			return false;
 		}
@@ -743,7 +766,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 		for (PropertyDesc propertyDesc : propertyDescs) {
 			boolean isMatchTable = isMatchTable(tableName, propertyDesc, propertyDesc.getAnnotation(Id.class));
 			if (isMatchTable == true) {
-				boolean didSet = setId(tableName, entity, propertyDesc, connection, isPrepare);
+				boolean didSet = setId(tableName, entity, propertyDesc, connection,ps, isPrepare);
 				if (didSet == true) {
 					return true;
 				}
@@ -763,7 +786,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 			} catch (Exception e) {
 				value = null;
 			}
-			boolean didSet = setIds(tableName, value, connection, isPrepare, processedObjects);
+			boolean didSet = setIds(tableName, value, connection, ps, isPrepare, processedObjects);
 			if (didSet == true) {
 				return true;
 			}
@@ -825,25 +848,25 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 		return StringUtil.equalsIgnoreCase(tableName, table);
 	}
 
-	protected <ENTITY> boolean setId(String tableName, ENTITY entity, PropertyDesc propertyDesc, Connection connection, boolean isPrepare) {
+	protected <ENTITY> boolean setId(String tableName, ENTITY entity, PropertyDesc propertyDesc, Connection connection, PreparedStatement ps, boolean isPrepare) {
 		Map<Class<? extends Dialect>, IdDefSet> idDefs = getIdDefs(propertyDesc);
 		IdDefSet idDefSet = getIdDefSet(idDefs, dialect.getClass());
 		if (idDefSet == null) {
 			idDefSet = idDefs.get(Default.class);
 		}
 		if (idDefSet != null) {
-			Class<? extends IdGenerator> type = idDefSet.type();
+			Class<? extends IdGenerator> strategy = idDefSet.strategy();
 			IdGenerator generator;
-			if (Enum.class.isAssignableFrom(type)) {
+			if (Enum.class.isAssignableFrom(strategy)) {
 				@SuppressWarnings({ "unchecked", "rawtypes" })
-				Class<? extends Enum> enumClass = (Class<? extends Enum>) type;
+				Class<? extends Enum> enumClass = (Class<? extends Enum>) strategy;
 				generator = EnumUtil.firstValue(enumClass, IdGenerator.class);
 			} else {
-				generator = ClassUtil.newInstance(type);
+				generator = ClassUtil.newInstance(strategy);
 			}
 
-			if (generator.isPrepare(dialect) == isPrepare) {
-				Object idValue = generator.generate(connection, dialect, idDefSet.name());
+			if (generator.generateBeforeInsert(dialect) == isPrepare) {
+				Object idValue = generator.generate(connection, ps, dialect, idDefSet.name());
 				dialect.setId(entity, propertyDesc, idValue);
 				return true;
 			}
@@ -919,8 +942,9 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 			Map<String, ParameterValue> values = getUpdateParameterValues(entities, updateColumnNames, tableMetaData);
 
 			String sql = createInsertSql(tableMetaData.getTableName(), updateColumnNames, values);
-			int ret = executeUpdate(values, sql);
-			setIds(tableMetaData.getTableName(), entity, connection, !PREPARE);
+			Triple<Integer, Connection, PreparedStatement> triple = executeUpdate(values, sql);
+			int ret = triple.first;
+			setIds(tableMetaData.getTableName(), entity, triple.second, triple.third, !PREPARE);
 			return ret;
 		} finally {
 			PropertyDesc.cacheModeOff();
@@ -1015,11 +1039,8 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 		return sql.toString();
 	}
 
-	protected String getDummyValString(String parameterName, Map<String, ParameterValue> values) {
-		// todo 0縺ｧ縺ｯ縺ｪ縺上・ｽ繝・ｽΑ繝ｼ縺ｮ繝・ｽ・ｽ繧ｿ繧定｡ｨ遉ｺ縺輔○縺溘＞
-		// 縺代←縲・ｽ・ｽ蠎ｦ逧・ｽ↑莠九ｂ縺ゅｋ縺九ｉ縲√→繧翫≠縺医★0
-		// ParameterValue value = values.get(parameterName);
-		// int dataType = value.getDataType();
+	protected String getDummyValString(String columnName, Map<String, ParameterValue> values) {
+		// TODO Return a reasonable string inferred from the column name.
 		return "0";
 	}
 
@@ -1078,7 +1099,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 				if (logger.isTraceEnabled()) {
 					logger.trace(Message.getMessage("00034", value, pd, tableName, columnName, Message.getMessage("00035"),path + "#" + pd.getPropertyName()));
 				}
-				values.add(new CandidateValue(value, DaoUtil.getTableNames(pd, columnName).contains(tableName),
+				values.add(new CandidateValue(value, getTableNames(pd, columnName).contains(tableName),
 						CandidateValue.PRIORITY_LEVEL_CONVENTION));
 			}
 		} catch (PropertyNotFoundRuntimeException e) {
@@ -1162,7 +1183,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 					logger.trace(Message.getMessage("00034", value, pd, tableNameSet.getFirstElement(), columnNameSet.getFirstElement(),
 							Message.getMessage("00036"), path + "#" + pd.getPropertyName()));
 				}
-				values.add(new CandidateValue(value, DaoUtil.getTableNames(pd, columnNameSet.getFirstElement()).contains(tableNameSet.getFirstElement()),
+				values.add(new CandidateValue(value, getTableNames(pd, columnNameSet.getFirstElement()).contains(tableNameSet.getFirstElement()),
 						CandidateValue.PRIORITY_LEVEL_COLUMN_ANNOTATION));
 			}
 		}
@@ -1200,7 +1221,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 						logger.trace(Message.getMessage("00034", value, pd, tableNameSet.getFirstElement(), columnNameSet.getFirstElement(),
 								Message.getMessage("00037"), path + "#" + pd.getPropertyName()));
 					}
-					values.add(new CandidateValue(value, DaoUtil.getTableNames(pd, columnNameSet.getFirstElement()).contains(tableNameSet.getFirstElement()),
+					values.add(new CandidateValue(value, getTableNames(pd, columnNameSet.getFirstElement()).contains(tableNameSet.getFirstElement()),
 							CandidateValue.PRIORITY_LEVEL_COLUMNS_ANNOTATION));
 				}
 			}
@@ -1211,7 +1232,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 	 * Unsupported next list.
 	 * <ul>
 	 * <li>@Id
-	 * <li>@Timespamp
+	 * <li>@Timestamp
 	 * <li>@VersionNo
 	 * <li>Locking
 	 * </ul>
@@ -1361,7 +1382,12 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 			prepareUpdate(tableMetaData.getTableName(), entity, locking);
 			values.putAll(getUpdateParameterValues(entities, updateColumnNames, tableMetaData));
 			String sql = createUpdateSql(tableMetaData.getTableName(), updateColumnNames, values, whereColumnNames);
-			return executeUpdate(values, sql);
+			Triple<Integer, Connection, PreparedStatement> triple = executeUpdate(values, sql);
+			try {
+				return triple.first;
+			} finally {
+				close(triple.second, triple.third);
+			}
 		} finally {
 			PropertyDesc.cacheModeOff();
 		}
@@ -1483,7 +1509,12 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 				throw new DaoRuntimeException("00044");
 			}
 			String sql = createDeleteSql(tableMetaData.getTableName(), whereColumnNames, values);
-			return executeUpdate(values, sql);
+			Triple<Integer, Connection, PreparedStatement> triple = executeUpdate(values, sql);
+			try {
+				return triple.first;
+			}finally {
+				close(triple.second,triple.third);
+			}
 		} finally {
 			PropertyDesc.cacheModeOff();
 		}
@@ -1579,7 +1610,12 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public int executeInsert(String sql, Map<String, Object> arg) {
-		return _executeUpdate(sql, arg);
+		Triple<Integer, Connection, PreparedStatement> triple = _executeUpdate(sql, arg);
+		try {
+			return triple.first;
+		} finally {
+			close(triple.second, triple.third);
+		}
 	}
 
     @Override
@@ -1589,7 +1625,12 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public int executeUpdate(String sql, Map<String, Object> arg) {
-		return _executeUpdate(sql, arg);
+		Triple<Integer, Connection, PreparedStatement> triple = _executeUpdate(sql, arg);
+		try {
+			return triple.first;
+		} finally {
+			close(triple.second, triple.third);
+		}
 	}
 
     @Override
@@ -1599,22 +1640,48 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public int executeDelete(String sql, Map<String, Object> arg) {
-		return _executeUpdate(sql, arg);
+		Triple<Integer, Connection, PreparedStatement> triple = _executeUpdate(sql, arg);
+		try {
+			return triple.first;
+		} finally {
+			close(triple.second, triple.third);
+		}
 	}
 
-	protected int _executeUpdate(String sql, Map<String, Object> arg) {
+	protected void close(Connection connection , PreparedStatement ps) {
+		try {
+			PreparedStatementUtil.close(ps);
+		} finally {
+			ConnectionUtil.close(connection);
+		}
+	}
+
+	protected Triple<Integer, Connection, PreparedStatement> _executeUpdate(String sql, Map<String, Object> arg) {
 		Map<String, ParameterValue> values = createParameterValues(arg);
 		return executeUpdate(values, sql);
 	}
 
-	protected int executeUpdate(Map<String, ParameterValue> values, String sql) {
+	protected Triple<Integer, Connection, PreparedStatement> executeUpdate(Map<String, ParameterValue> values, String sql) {
 		return executeUpdate(values, sql, null, true);
 	}
 
     @Override
 	public int execute(Sql sql, Object... entity) throws SQLRuntimeException {
+		Connection connection = null;
+		PreparedStatement ps = null;
+		try {
+			Triple<Integer, Connection, PreparedStatement> result = _execute(sql, entity);
+			connection = result.second();
+			ps = result.third();
+			return result.first;
+		} finally {
+			close(connection, ps);
+		}
+	}
+
+	public Triple<Integer, Connection, PreparedStatement> _execute(Sql sql, Object... entity) throws SQLRuntimeException {
 		List<?> list = getList(entity);
-		SqlContext context = createSqlConetxt(entity, list, false);
+		SqlContext context = createSqlContext(entity, list, false);
 		String sqlString = sql.getSql(context);
 		Map<String, ParameterValue> values = toValues(entity, context.getParameters());
 		return executeUpdate(values, sqlString, context, true);
@@ -1627,8 +1694,8 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 				return (List<?>) object;
 			}
 			if (object instanceof Map) {
-				Set<Map.Entry> entrySet = ((Map) object).entrySet();
-				for (Map.Entry entry : entrySet) {
+				Set<Entry> entrySet = ((Map) object).entrySet();
+				for (Entry entry : entrySet) {
 					Object value = entry.getValue();
 					if (value instanceof List) {
 						return (List<?>) value;
@@ -1657,7 +1724,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 	}
 
 	@Internal
-	public int executeUpdate(Map<String, ParameterValue> values, String sql, SqlContext context, boolean isDynamic) {
+	public Triple<Integer, Connection, PreparedStatement> executeUpdate(Map<String, ParameterValue> values, String sql, SqlContext context, boolean isDynamic) {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		try {
@@ -1671,14 +1738,13 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 				logSql(sql, null, null, dialect, ExecuteType.UPDATE);
 				ps = createPreparedStatement(connection, sql, dialect);
 			}
-			return PreparedStatementUtil.executeUpdate(ps, sqlLogRegistry);
+			int count = PreparedStatementUtil.executeUpdate(ps, sqlLogRegistry);
+			return new Triple<>(count, connection, ps);
+		} catch (Exception e) {
+			close(connection, ps);
+			throw e;
 		} finally {
 			TmpFileUtil.deleteThreadLocalTmpFiles();
-			try {
-				StatementUtil.close(ps);
-			} finally {
-				ConnectionUtil.close(connection);
-			}
 		}
 	}
 
@@ -1812,7 +1878,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
     @Override
 	public <ROW> List<ROW> select(Sql sql, Map<String, Object> arg, Class<ROW> entityClass) throws SQLRuntimeException {
 		IterationCallback<ROW> callback = new DBListIterationCallback<ROW>();
-		SqlContext context = createSqlConetxt(arg);
+		SqlContext context = createSqlContext(arg);
 		String sqlString = sql.getSql(context);
 		return select(sqlString, context.getParameters(), entityClass, callback);
 	}
@@ -1894,17 +1960,17 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public <ROW> List<ROW> select(Sql sql, ROW query) {
-		SqlContext context = createSqlConetxt(query);
+		SqlContext context = createSqlContext(query);
 		String sqlString = sql.getSql(context);
 		return select(sqlString, context.getParameters(), getClass(query));
 	}
 
-	protected <QUERY_OR_ENTITY> SqlContext createSqlConetxt(QUERY_OR_ENTITY queryOrEntity) {
-		return createSqlConetxt(new Object[] { queryOrEntity }, null, true);
+	protected <QUERY_OR_ENTITY> SqlContext createSqlContext(QUERY_OR_ENTITY queryOrEntity) {
+		return createSqlContext(new Object[] { queryOrEntity }, null, true);
 	}
 
 	@SuppressWarnings("unchecked")
-	protected <QUERY_OR_ENTITY> SqlContext createSqlConetxt(Object[] queryOrEntity, List<?> values, boolean isSelect) {
+	protected <QUERY_OR_ENTITY> SqlContext createSqlContext(Object[] queryOrEntity, List<?> values, boolean isSelect) {
 		String tableName = getTableName(queryOrEntity[0], getConnection());
 		TableMetaData tableMetaData = getTableMetaData(tableName);
 		for (int i = 0; i < queryOrEntity.length; i++) {
@@ -2054,14 +2120,14 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public <ROW> List<ROW> select(Sql sql, ROW query, IterationCallback<ROW> callback) {
-		SqlContext context = createSqlConetxt(query);
+		SqlContext context = createSqlContext(query);
 		String sqlString = sql.getSql(context);
 		return select(sqlString, context.getParameters(), getClass(query), callback);
 	}
 
     @Override
 	public List<Map<String, Object>> selectMap(Sql sql, Map<String, Object> query) {
-		SqlContext context = createSqlConetxt(query);
+		SqlContext context = createSqlContext(query);
 		String sqlString = sql.getSql(context);
 		return selectMap(sqlString, context.getParameters());
 	}
@@ -2080,7 +2146,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public List<Map<String, Object>> selectMap(Sql sql, Map<String, Object> query, IterationCallback<Map<String, Object>> callback) {
-		SqlContext context = createSqlConetxt(query);
+		SqlContext context = createSqlContext(query);
 		String sqlString = sql.getSql(context);
 		return selectMap(sqlString, context.getParameters(), callback);
 	}
@@ -2093,14 +2159,14 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public <ROW> Optional<ROW> selectOne(Sql sql, ROW query) {
-		SqlContext context = createSqlConetxt(query);
+		SqlContext context = createSqlContext(query);
 		String sqlString = sql.getSql(context);
 		return selectOne(sqlString, context.getParameters(), getClass(query));
 	}
 
     @Override
 	public Optional<Map<String, Object>> selectOneMap(Sql sql, Map<String, Object> query) {
-		SqlContext context = createSqlConetxt(query);
+		SqlContext context = createSqlContext(query);
 		String sqlString = sql.getSql(context);
 		return selectOneMap(sqlString, context.getParameters());
 	}
@@ -2112,14 +2178,14 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
     @Override
 	public Optional<BigDecimal> selectOneNumber(Sql sql, Map<String, Object> query) {
-		SqlContext context = createSqlConetxt(query);
+		SqlContext context = createSqlContext(query);
 		String sqlString = sql.getSql(context);
 		return selectOneNumber(sqlString, context.getParameters());
 	}
 
     @Override
 	public <QUERY> Optional<BigDecimal> selectOneNumber(Sql sql, QUERY query) {
-		SqlContext context = createSqlConetxt(query);
+		SqlContext context = createSqlContext(query);
 		String sqlString = sql.getSql(context);
 		return selectOneNumber(sqlString, context.getParameters());
 	}
@@ -2158,7 +2224,7 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 	}
 
 	protected Object getLastInsertId() {
-		return Identity.IDENTITY.generate(getConnection(), dialect, null);
+		return Identity.IDENTITY.generate(getConnection(), null, dialect, null);
 	}
 
     @Override
@@ -2256,5 +2322,6 @@ public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 		return selectMap(sql, query, new ConsumerWrapper<>(callback));
 	}
 
-
+	public record Triple<A, B, C>(A first, B second, C third) {
+	}
 }

@@ -19,23 +19,22 @@ import jp.dodododo.dao.dialect.sqlite.SQLite;
 import jp.dodododo.dao.id.Identity;
 import jp.dodododo.dao.id.Sequence;
 import jp.dodododo.dao.impl.Dept;
-import jp.dodododo.dao.log.SqlLogRegistry;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class CreateMethodPropertyTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 
 	private Dao dao;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestDao(dbTestRule.getDataSource());
+		dao = newTestDao(dbTestExtension.getDataSource());
 
 		Emp emp = new Emp();
 		emp.dept = new Dept();
@@ -59,9 +58,9 @@ public class CreateMethodPropertyTest {
 	}
 
 	public static class Emp {
-		@Id(value = { @IdDefSet(type = Sequence.class, name = "sequence"),
-				@IdDefSet(type = Identity.class, db = SQLite.class),
-				@IdDefSet(type = Identity.class, db = MySQL.class) },
+		@Id(value = { @IdDefSet(strategy = Sequence.class, name = "sequence"),
+				@IdDefSet(strategy = Identity.class, db = SQLite.class),
+				@IdDefSet(strategy = Identity.class, db = MySQL.class) },
 				targetTables = { "emp" })
 		public String EMPNO;
 

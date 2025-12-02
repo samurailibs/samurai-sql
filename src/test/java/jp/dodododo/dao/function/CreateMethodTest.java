@@ -17,16 +17,15 @@ import jp.dodododo.dao.annotation.Id;
 import jp.dodododo.dao.annotation.IdDefSet;
 import jp.dodododo.dao.id.Sequence;
 import jp.dodododo.dao.impl.Dept;
-import jp.dodododo.dao.log.SqlLogRegistry;
-import jp.dodododo.dao.unit.DbTestRule;
+import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class CreateMethodTest {
 
-	@Rule
-	public DbTestRule dbTestRule = new DbTestRule();
+	@RegisterExtension
+	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
 
@@ -105,7 +104,7 @@ public class CreateMethodTest {
 
 	@Bean(createMethod = "@jp.dodododo.dao.function.CreateMethodTest@createEmp(resultSetMap)")
 	public static class Emp {
-		@Id(value = @IdDefSet(type = Sequence.class, name = "sequence"), targetTables = { "emp" })
+		@Id(value = @IdDefSet(strategy = Sequence.class, name = "sequence"), targetTables = { "emp" })
 		public String EMPNO;
 
 		@Column("ename")
@@ -166,6 +165,6 @@ public class CreateMethodTest {
 	}
 
 	private DataSource getDataSource() {
-		return dbTestRule.getDataSource();
+		return dbTestExtension.getDataSource();
 	}
 }
