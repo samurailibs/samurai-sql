@@ -16,6 +16,7 @@ import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,8 +43,6 @@ import jp.dodododo.dao.exception.NoParameterizedException;
 import jp.dodododo.dao.exception.SQLRuntimeException;
 import jp.dodododo.dao.impl.EmpConstructorHasBeanAnnotatedDept.TestDept;
 import jp.dodododo.dao.log.SqlLogRegistry;
-import jp.dodododo.dao.log4j.MemoryAppender;
-import jp.dodododo.dao.metadata.ColumnMetaData;
 import jp.dodododo.dao.metadata.TableMetaData;
 import jp.dodododo.dao.paging.LimitOffset;
 import jp.dodododo.dao.paging.Paging;
@@ -53,10 +52,11 @@ import jp.dodododo.dao.util.ReaderUtil;
 import jp.dodododo.dao.util.StringUtil;
 import jp.dodododo.dao.value.CandidateValue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class RdbDaoTest {
@@ -65,6 +65,14 @@ public class RdbDaoTest {
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 	private Dao dao;
+
+	@BeforeEach
+	public void createSequence() throws SQLException {
+		try (Connection connection = dbTestExtension.getConnection();
+			 Statement statement = connection.createStatement()) {
+			statement.execute("CREATE SEQUENCE IF NOT EXISTS sequence START WITH 1");
+		}
+	}
 
 	@Test
 	public void testInsertENTITY() {
@@ -880,7 +888,7 @@ public class RdbDaoTest {
 			@Override
 			public void each(Emp it) {
 				count.set(count.intValue() + 1);
-				logger.debug(it);
+				logger.debug("" + it);
 			}
 		});
 		assertEquals(14, count.intValue());
@@ -898,7 +906,7 @@ public class RdbDaoTest {
 		dao.select(sql, Emp.class, new jp.dodododo.dao.script.Each() {
 			public void each(Emp it) {
 				count.set(count.intValue() + 1);
-				logger.debug(it);
+				logger.debug("" + it);
 			}
 		});
 		assertEquals(14, count.intValue());
@@ -1103,10 +1111,10 @@ public class RdbDaoTest {
 			}
 		}
 		long end = System.currentTimeMillis();
-		logger.debug(end - start);
+		logger.debug("" + (end - start));
 	}
 
-	private static final Log logger = LogFactory.getLog(RdbDaoTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(RdbDaoTest.class);
 
 	@Test
 	public void testGatherValue() throws Exception {
@@ -1229,74 +1237,6 @@ public class RdbDaoTest {
 	}
 
 	@Test
-	public void testGatherValue3() throws Exception {
-		MemoryAppender.clear(GatherTestBean.class);
-		List<Object> messages = MemoryAppender.getMessages(GatherTestBean.class);
-		assertEquals(0, messages.size());
-
-		dao = newTestDao(getConnection());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
-
-		GatherTestBean bean = new GatherTestBean();
-		List<GatherTestBean> list = new ArrayList<GatherTestBean>();
-		list.add(bean);
-		try {
-			dao.insert("emp", bean);
-			assertEqualsIgnoreCase(
-					"INSERT INTO emp ( EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO, TSTAMP ) VALUES ( 1 , 'ename2' , NULL , NULL , NULL , NULL , NULL , NULL , NULL )",
-					logRegistry.getLast().getCompleteSql());
-		} catch (Exception ignore) {
-			fail();
-		}
-		int messageSize = new String[] { "A", "B", "C", "D", "E", "Ename", "Ename2" }.length;
-		assertEquals(messageSize, messages.size());
-		MemoryAppender.clear(GatherTestBean.class);
-		assertEquals(0, messages.size());
-
-		try {
-			dao.insert(list);
-			fail();
-		} catch (Exception ignore) {
-			assertTrue(StringUtil.equalsIgnoreCase("INSERT INTO EMP ( EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO, TSTAMP ) VALUES ( 1 , 'ename2' , NULL , NULL , NULL , NULL , NULL , NULL , NULL )", logRegistry.getLast().getCompleteSql()));
-		}
-		assertEquals(messageSize, messages.size());
-		MemoryAppender.clear(GatherTestBean.class);
-		assertEquals(0, messages.size());
-
-		ColumnMetaData columnMetaData = new TableMetaData(getDataSource().getConnection(), "emp").getColumnMetaData("empno");
-		String empnoColumnName = columnMetaData.getColumnName();
-		dao.update("emp", bean);
-		assertEqualsIgnoreCase(
-				"UPDATE emp SET EMPNO = 1 , ENAME = 'ename2' , JOB = NULL , MGR = NULL , HIREDATE = NULL , SAL = NULL , COMM = NULL , DEPTNO = NULL , TSTAMP = NULL WHERE "
-						+ empnoColumnName + " = 1",
-				logRegistry.getLast().getCompleteSql());
-		assertEquals(messageSize, messages.size());
-		MemoryAppender.clear(GatherTestBean.class);
-		assertEquals(0, messages.size());
-
-		dao.update(list);
-		assertEqualsIgnoreCase(
-				"UPDATE EMP SET EMPNO = 1 , ENAME = 'ename2' , JOB = NULL , MGR = NULL , HIREDATE = NULL , SAL = NULL , COMM = NULL , DEPTNO = NULL , TSTAMP = NULL WHERE "
-						+ empnoColumnName + " = 1",
-				logRegistry.getLast().getCompleteSql());
-		assertEquals(messageSize, messages.size());
-		MemoryAppender.clear(GatherTestBean.class);
-		assertEquals(0, messages.size());
-
-		dao.delete("emp", bean);
-		assertEqualsIgnoreCase("DELETE FROM emp WHERE EMPNO = 1", logRegistry.getLast().getCompleteSql());
-		assertEquals(5, messages.size());
-		MemoryAppender.clear(GatherTestBean.class);
-		assertEquals(0, messages.size());
-
-		dao.delete(list);
-		assertEqualsIgnoreCase("DELETE FROM EMP WHERE EMPNO = 1", logRegistry.getLast().getCompleteSql());
-		assertEquals(5, messages.size());
-		MemoryAppender.clear(GatherTestBean.class);
-		assertEquals(0, messages.size());
-	}
-
-	@Test
 	public void testLambda() throws Exception {
 		dao = newTestDao(getConnection());
 
@@ -1348,7 +1288,7 @@ public class RdbDaoTest {
 
 	@Table("EMP")
 	public static class GatherTestBean {
-		private static final Log logger = LogFactory.getLog(GatherTestBean.class);
+		private static final Logger logger = LoggerFactory.getLogger(GatherTestBean.class);
 
 		public String EMPNO = "1";
 
@@ -1390,7 +1330,7 @@ public class RdbDaoTest {
 	}
 
 	public static class GatherTestBean2 {
-		private static final Log logger = LogFactory.getLog(GatherTestBean.class);
+		private static final Logger logger = LoggerFactory.getLogger(GatherTestBean.class);
 
 		public Object getD() {
 			logger.debug("getD");

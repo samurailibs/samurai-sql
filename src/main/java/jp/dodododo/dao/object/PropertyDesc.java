@@ -21,7 +21,6 @@ import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Bean;
 import jp.dodododo.dao.annotation.Internal;
 import jp.dodododo.dao.annotation.Property;
-import jp.dodododo.dao.commons.Bool;
 import jp.dodododo.dao.exception.IllegalPropertyRuntimeException;
 import jp.dodododo.dao.message.Message;
 import jp.dodododo.dao.object.aop.field.FieldAccess;
@@ -33,14 +32,14 @@ import jp.dodododo.dao.util.MethodUtil;
 import jp.dodododo.dao.util.StringUtil;
 import jp.dodododo.dao.util.ThreadLocalUtil;
 import jp.dodododo.dao.util.TypesUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 @Internal
 public class PropertyDesc implements AnnotatedElement {
 
-	private static final Log logger = LogFactory.getLog(PropertyDesc.class);
+	private static final Logger logger = LoggerFactory.getLogger(PropertyDesc.class);
 
 	protected String propertyName;
 

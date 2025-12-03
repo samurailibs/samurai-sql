@@ -1,7 +1,7 @@
 package jp.dodododo.dao.issue;
 
 import static jp.dodododo.dao.util.DaoUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -9,12 +9,12 @@ import java.text.SimpleDateFormat;
 import jp.dodododo.dao.config.DaoConfig;
 import jp.dodododo.dao.row.Row;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class Issue8Test {
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss");
 	}

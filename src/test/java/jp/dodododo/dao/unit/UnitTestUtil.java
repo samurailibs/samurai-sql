@@ -13,9 +13,9 @@ import javax.sql.DataSource;
 import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.impl.RdbDao;
 import jp.dodododo.dao.object.PropertyDesc;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import jp.dodododo.dao.util.FieldUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UnitTestUtil {
 
@@ -45,7 +45,7 @@ public class UnitTestUtil {
 
 	public static class Handler implements InvocationHandler {
 
-		protected static final Log logger = LogFactory.getLog(Handler.class);
+		private static final Logger logger = LoggerFactory.getLogger(Handler.class);
 
 		protected Dao dao;
 

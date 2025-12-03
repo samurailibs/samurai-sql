@@ -1,31 +1,24 @@
 package jp.dodododo.dao.metadata;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Connection;
 
 import javax.sql.DataSource;
 
 import jp.dodododo.dao.unit.DbTestExtension;
-
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.FromDataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-@RunWith(Theories.class)
 public class TableMetaDataTest {
-
-	@DataPoints({"tableNames"})
-	public static String[] tableNames = {"emp", "EMP", "Emp", "EmP", "EMp"};
 
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	@Theory
-	public void tableMetaDataConnectionString(@FromDataPoints("tableNames") String tableName) {
+	@ParameterizedTest
+	@ValueSource(strings = {"emp", "EMP", "Emp", "EmP", "EMp"})
+	public void tableMetaDataConnectionString(String tableName) {
 		TableMetaData data = new TableMetaData(getConnection(), tableName);
 
 		ColumnMetaData columnMetaData = data.getColumnMetaData("ename");
@@ -34,12 +27,9 @@ public class TableMetaDataTest {
 		assertTrue(pk.isPrimaryKey());
 	}
 
-	private DataSource getDataSource() {
-		return dbTestExtension.getDataSource();
-	}
-
-	private Connection getConnection() {
+	protected Connection getConnection() {
 		return dbTestExtension.getConnection();
 	}
 
 }
+

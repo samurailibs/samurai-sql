@@ -1,6 +1,6 @@
 package jp.dodododo.dao.object;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Map;
 import jp.dodododo.dao.impl.Emp;
 import jp.dodododo.dao.types.JavaTypes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MapObjectDescTest {
 

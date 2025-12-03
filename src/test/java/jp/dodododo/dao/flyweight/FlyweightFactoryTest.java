@@ -5,23 +5,24 @@ import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class FlyweightFactoryTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
-	@Override
-	protected void setUp() throws Exception {
-	}
+public class FlyweightFactoryTest {
 
-	@Override
-	protected void tearDown() throws Exception {
+
+	@BeforeEach
+	public void tearDown() throws Exception {
 		FlyweightFactory.setFactory(FlyweightFactory.DEFAULT_FLYWEIGHT_FACTORY);
 	}
 
+	@Test
 	public void testFlyweightFactory() {
 		FlyweightFactory.setFactory(new FlyweightFactory());
 
-		assertEquals(FlyweightFactory.get(null), FlyweightFactory.get(null));
+		assertEquals((Short)FlyweightFactory.get(null), (Short)FlyweightFactory.get(null));
 
 		assertSame(FlyweightFactory.get(new Boolean(true)), FlyweightFactory.get(new Boolean(true)));
 
@@ -54,10 +55,11 @@ public class FlyweightFactoryTest extends TestCase {
 		assertSame(FlyweightFactory.get(calendar1), FlyweightFactory.get(calendar2));
 	}
 
+	@Test
 	public void testNullFlyweightFactory() {
 		FlyweightFactory.setFactory(new NullFlyweightFactory());
 
-		assertEquals(FlyweightFactory.get(null), FlyweightFactory.get(null));
+		assertEquals(FlyweightFactory.get(null), (Short) FlyweightFactory.get(null));
 
 		assertNotSame(FlyweightFactory.get(new Boolean(true)), FlyweightFactory.get(new Boolean(true)));
 

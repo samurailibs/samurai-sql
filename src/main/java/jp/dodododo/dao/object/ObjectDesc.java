@@ -18,8 +18,8 @@ import jp.dodododo.dao.util.CaseInsensitiveMap;
 import jp.dodododo.dao.util.EmptyUtil;
 import jp.dodododo.dao.util.TypesUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Beanではなくて、プロパティー名をDB寄りとして扱う。<br>
@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 @Internal
 public class ObjectDesc<OBJ> {
 
-	private static final Log logger = LogFactory.getLog(ObjectDesc.class);
+	private static final Logger logger = LoggerFactory.getLogger(ObjectDesc.class);
 
 	protected Class<OBJ> targetClass;
 

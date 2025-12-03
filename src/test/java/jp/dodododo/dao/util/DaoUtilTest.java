@@ -12,11 +12,14 @@ import jp.dodododo.dao.annotation.Table;
 import jp.dodododo.dao.object.ObjectDescFactory;
 import jp.dodododo.dao.object.PropertyDesc;
 import jp.dodododo.dao.sql.orderby.OrderByArg;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class DaoUtilTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class DaoUtilTest {
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testOrderBy() {
 
 		List<OrderByArg> orderBy = (List<OrderByArg>) orderBy("a", "b").get(ORDER_BY);
@@ -61,6 +64,7 @@ public class DaoUtilTest extends TestCase {
 		assertEquals(ASC, orderBy.get(2).getSortType());
 	}
 
+	@Test
 	public void testGetTableNames() {
 		PropertyDesc pd = ObjectDescFactory.getObjectDesc(TestBean.class).getPropertyDesc("foo");
 		Set<String> tableNames = getTableNames(pd, "col");

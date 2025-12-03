@@ -12,14 +12,14 @@ import jp.dodododo.dao.annotation.Relations;
 import jp.dodododo.dao.message.Message;
 import jp.dodododo.dao.util.EmptyUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Internal
 public class CandidateValue implements Serializable {
 	private static final long serialVersionUID = -2173377825923811975L;
 
-	protected static final Log logger = LogFactory.getLog(CandidateValue.class);
+	protected static final Logger logger = LoggerFactory.getLogger(CandidateValue.class);
 
 	/**
 	 * {@link Relations}で一致。

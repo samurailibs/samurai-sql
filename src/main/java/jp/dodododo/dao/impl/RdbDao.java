@@ -105,13 +105,12 @@ import jp.dodododo.dao.value.OGNLValueProxy;
 import jp.dodododo.dao.value.ParameterValue;
 import jp.dodododo.dao.value.ValueProxy;
 import jp.dodododo.dao.wrapper.ConnectionWrapper;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RdbDao implements Dao, ExtendedExecuteUpdateDao {
 
-	protected static final Log logger = LogFactory.getLog(RdbDao.class);
+	protected static final Logger logger = LoggerFactory.getLogger(RdbDao.class);
 
 	protected static final String DEFAULT_WHERE_COLUMN_PREFIX = "where___";
 

@@ -1,6 +1,6 @@
 package jp.dodododo.dao.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.FileInputStream;
 import java.net.URLClassLoader;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import jp.dodododo.dao.types.JavaType;
 import jp.dodododo.dao.types.JavaTypes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TypesUtilTest {
 

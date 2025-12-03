@@ -1,10 +1,10 @@
 package jp.dodododo.dao.log;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SlowQuery {
-	private static final Log logger = LogFactory.getLog(SlowQuery.class);
+	private static final Logger logger = LoggerFactory.getLogger(SlowQuery.class);
 
 	public static void warn(double time, String slowQuerySql) {
 		String caller = "";

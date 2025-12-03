@@ -14,12 +14,12 @@ import java.util.Map;
 import jp.dodododo.dao.config.DaoConfig;
 import jp.dodododo.dao.util.EmptyUtil;
 import jp.dodododo.dao.util.ThreadLocalUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SqlLogRegistry {
 
-	private static final Log logger = LogFactory.getLog(SlowQuery.class);
+	private static final Logger logger = LoggerFactory.getLogger(SlowQuery.class);
 
 	protected DaoConfig config;
 

@@ -1,10 +1,10 @@
 package jp.dodododo.dao.lazyloading;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ProxyFactoryTest extends ProxyFactory {
 

@@ -4,7 +4,7 @@ import static jp.dodododo.dao.sql.GenericSql.*;
 import static jp.dodododo.dao.unit.Assert.*;
 import static jp.dodododo.dao.unit.UnitTestUtil.*;
 import static jp.dodododo.dao.util.DaoUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class ExecuteXxxTest {
 				values("EMPNO", EmpNo.TEST_NO, //
 						"ENAME", Ename.TEST_NAME));
 		String sql = logRegistry.getLast().getCompleteSql();
-		assertTrue(sql, StringUtil.equalsIgnoreCase("INSERT INTO EMP (EMPNO ,ENAME) VALUES (101 ,'TEST_NAME')", sql));
+		assertTrue(StringUtil.equalsIgnoreCase("INSERT INTO EMP (EMPNO ,ENAME) VALUES (101 ,'TEST_NAME')", sql), sql);
 		count = dao.selectOneNumber(COUNT_ALL, args(TABLE_NAME, "emp")).get();
 		assertEquals(2, count.intValue());
 

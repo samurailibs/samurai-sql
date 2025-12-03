@@ -36,4 +36,7 @@ public class ObjectDescFactory {
 		return objectDesc;
 	}
 
+	public static void clearCache() {
+		OBJECT_DESC_CACHE.clear();
+	}
 }

@@ -14,8 +14,7 @@ public class HSQL extends Standard {
 
 	@Override
 	public String sequenceNextValSql(String sequenceName) {
-		return "SELECT NEXT VALUE FOR " + sequenceName
-				+ " FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_name = 'SYSTEM_TABLES'";
+		return "CALL NEXT VALUE FOR " + sequenceName;
 	}
 
 }

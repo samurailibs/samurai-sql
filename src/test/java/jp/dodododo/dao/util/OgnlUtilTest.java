@@ -4,20 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jp.dodododo.dao.util.OgnlUtil.OgnlRuntimeException;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class OgnlUtilTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+public class OgnlUtilTest {
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testGetValueStringObject() {
 		String exp = "a.b.c";
 		Map<String, Object> root = new HashMap<String, Object>();

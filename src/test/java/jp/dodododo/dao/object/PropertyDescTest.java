@@ -1,7 +1,6 @@
 package jp.dodododo.dao.object;
 
-import static jp.dodododo.dao.commons.Bool.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +14,15 @@ import jp.dodododo.dao.exception.PropertyNotFoundRuntimeException;
 import jp.dodododo.dao.lazyloading.LazyLoadingProxy;
 import jp.dodododo.dao.lazyloading.ProxyFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PropertyDescTest {
+
+	@BeforeEach
+	public void clear(){
+		ObjectDescFactory.clearCache();
+	}
 
 	@Test
 	public void testReadable() {
@@ -83,7 +88,7 @@ public class PropertyDescTest {
 
 		public List<String> property2;
 
-		@Property(AccessMode.WRITE_ONLY)
+		@Property(AccessMode.READ_ONLY)
 		private List<String> property3;
 
 		@Property(AccessMode.WRITE_ONLY)

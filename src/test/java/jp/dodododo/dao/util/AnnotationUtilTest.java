@@ -9,10 +9,13 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class AnnotationUtilTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
+public class AnnotationUtilTest {
+
+	@Test
 	public void testGetParameterAnnotations() {
 		Constructor<?>[] constructors = TargetClass.class.getConstructors();
 
@@ -29,6 +32,7 @@ public class AnnotationUtilTest extends TestCase {
 		assertNull(parameterAnnotations2.get(3));
 	}
 
+	@Test
 	public void testGetParameterAnnotationsConstructorInt() {
 		Constructor<?>[] constructors = TargetClass.class.getConstructors();
 

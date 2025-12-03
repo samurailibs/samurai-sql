@@ -4,10 +4,13 @@ import java.lang.annotation.ElementType;
 
 import jp.dodododo.dao.annotation.NumKey;
 import jp.dodododo.dao.annotation.StringKey;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class EnumConverterTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
+public class EnumConverterTest {
+
+	@Test
 	public void testConvert() {
 
 		ElementType result4 = EnumConverter.convert(9, ElementType.class);
@@ -32,6 +35,7 @@ public class EnumConverterTest extends TestCase {
 		assertSame(NumEnum.B, result8);
 	}
 
+	@Test
 	public void testNull() {
 		assertSame(NumContainsNull.A, EnumConverter.convert(1, NumContainsNull.class));
 		assertSame(NumContainsNull.B, EnumConverter.convert(2, NumContainsNull.class));

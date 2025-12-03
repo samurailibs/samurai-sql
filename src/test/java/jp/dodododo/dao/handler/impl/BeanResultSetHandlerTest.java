@@ -1,6 +1,6 @@
 package jp.dodododo.dao.handler.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -14,7 +14,7 @@ import jp.dodododo.dao.columns.ResultSetColumn;
 import jp.dodododo.dao.exception.InstantiationRuntimeException;
 import jp.dodododo.dao.util.ClassUtil;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BeanResultSetHandlerTest {
 

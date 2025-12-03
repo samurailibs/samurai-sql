@@ -1,7 +1,7 @@
 package jp.dodododo.dao.function;
 
 import static jp.dodododo.dao.unit.UnitTestUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Constructor;
 import java.util.Date;
@@ -39,11 +39,11 @@ public class CreateMethodTest {
 		for (Emp selectedEmp : select) {
 
 			if (selectedEmp.EMPNO.equals("23")) {
-				assertTrue(selectedEmp.getClass().toString(), selectedEmp instanceof Smith);
+				assertTrue(selectedEmp instanceof Smith, selectedEmp.getClass().toString());
 			} else {
-				assertFalse(selectedEmp.getClass().toString(), selectedEmp instanceof Smith);
-				assertFalse(selectedEmp.getClass().toString(), selectedEmp instanceof Emp3);
-				assertFalse(selectedEmp.getClass().toString(), selectedEmp instanceof Emp2);
+				assertFalse(selectedEmp instanceof Smith, selectedEmp.getClass().toString());
+				assertFalse(selectedEmp instanceof Emp3, selectedEmp.getClass().toString());
+				assertFalse(selectedEmp instanceof Emp2, selectedEmp.getClass().toString());
 			}
 
 			assertNotNull(selectedEmp.dept);
@@ -61,11 +61,11 @@ public class CreateMethodTest {
 		for (Emp selectedEmp : select) {
 
 			if (selectedEmp.EMPNO.equals("23")) {
-				assertTrue(selectedEmp.getClass().toString(), selectedEmp instanceof Smith);
+				assertTrue(selectedEmp instanceof Smith, selectedEmp.getClass().toString());
 			} else {
-				assertFalse(selectedEmp.getClass().toString(), selectedEmp instanceof Smith);
-				assertFalse(selectedEmp.getClass().toString(), selectedEmp instanceof Emp3);
-				assertTrue(selectedEmp.getClass().toString(), selectedEmp instanceof Emp2);
+				assertFalse(selectedEmp instanceof Smith, selectedEmp.getClass().toString());
+				assertFalse(selectedEmp instanceof Emp3, selectedEmp.getClass().toString());
+				assertTrue(selectedEmp instanceof Emp2, selectedEmp.getClass().toString());
 			}
 
 			assertNotNull(selectedEmp.dept);
@@ -83,11 +83,11 @@ public class CreateMethodTest {
 		for (Emp selectedEmp : select) {
 
 			if (selectedEmp.EMPNO.equals("23")) {
-				assertTrue(selectedEmp.getClass().toString(), selectedEmp instanceof Smith);
+				assertTrue(selectedEmp instanceof Smith, selectedEmp.getClass().toString());
 			} else {
-				assertFalse(selectedEmp.getClass().toString(), selectedEmp instanceof Smith);
-				assertTrue(selectedEmp.getClass().toString(), selectedEmp instanceof Emp3);
-				assertTrue(selectedEmp.getClass().toString(), selectedEmp instanceof Emp2);
+				assertFalse(selectedEmp instanceof Smith, selectedEmp.getClass().toString());
+				assertTrue(selectedEmp instanceof Emp3, selectedEmp.getClass().toString());
+				assertTrue(selectedEmp instanceof Emp2, selectedEmp.getClass().toString());
 			}
 
 			assertNotNull(selectedEmp.dept);

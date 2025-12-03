@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import jp.dodododo.dao.object.ObjectDesc;
 import jp.dodododo.dao.object.PropertyDesc;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SqlLogRegistryTest {
 

@@ -5,10 +5,13 @@ import jp.dodododo.dao.context.CommandContext;
 import jp.dodododo.dao.dialect.Dialect;
 import jp.dodododo.dao.dialect.HSQL;
 import jp.dodododo.dao.util.DaoUtil;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class AbstractNodeTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
+public class AbstractNodeTest {
+
+	@Test
 	public void testIsEnclosedBySingleQuot() {
 		AbstractNode node = new AbstractNode() {
 		    @Override
@@ -30,6 +33,7 @@ public class AbstractNodeTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testGetValueOgnl() {
 		AbstractNode node = new AbstractNode() {
 		    @Override
@@ -49,6 +53,7 @@ public class AbstractNodeTest extends TestCase {
 		assertTrue(node.getValue(expression, names, root, dialect) instanceof Foo);
 	}
 
+	@Test
 	public void testGetValueDialect() {
 		AbstractNode node = new AbstractNode() {
 		    @Override

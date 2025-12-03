@@ -1,13 +1,13 @@
 package jp.dodododo.dao.object;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ObjectDescFactoryTest extends ObjectDescFactory {
 

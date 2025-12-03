@@ -1,23 +1,22 @@
 package jp.dodododo.dao.object;
 
-//import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jp.dodododo.dao.impl.Emp;
-import junit.framework.TestCase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class MapPropertyDescTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class MapPropertyDescTest {
 
 	@Test
 	public void testMapPropertyDesc() {
 
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("a", 1);
 		map.put("b", "str");
 		map.put("c", new Emp());

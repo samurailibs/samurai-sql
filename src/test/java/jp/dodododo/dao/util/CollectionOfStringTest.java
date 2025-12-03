@@ -7,20 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import jp.dodododo.dao.paging.Paging;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class CollectionOfStringTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+public class CollectionOfStringTest {
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testList() {
 		List<String> list = list("a", "b", "c", "d", "e");
 		assertEquals(5, list.size());
@@ -32,6 +25,7 @@ public class CollectionOfStringTest extends TestCase {
 		assertEquals("e", iterator.next());
 	}
 
+	@Test
 	public void testMap() {
 		Map<String, Object> map = map(new StringBuilder("a"), "b", "c", "d");
 		assertEquals(2, map.size());
@@ -42,6 +36,7 @@ public class CollectionOfStringTest extends TestCase {
 		assertEquals("e", map.get(null));
 	}
 
+	@Test
 	public void testMap2() {
 		Map<String, Object> map = map(new StringBuilder("a"), "b", "c", "d", map("e", "f"), "g");
 		assertEquals("b", map.get("a"));
@@ -51,6 +46,7 @@ public class CollectionOfStringTest extends TestCase {
 		assertNull(map.get("g"));
 	}
 
+	@Test
 	public void testMap3() {
 		Map<String, Object> map = map(new Paging(1, 1));
 		Paging paging = (Paging) map.get(null);
@@ -64,6 +60,7 @@ public class CollectionOfStringTest extends TestCase {
 		assertNotNull(paging);
 	}
 
+	@Test
 	public void testMap4() {
 		Map<String, Object> map = map("null", null, "a", "b");
 		assertNull(map.get("null"));

@@ -5,20 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import jp.dodododo.dao.object.target.Target;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ObjectDescTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+public class ObjectDescTest {
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testNoPublicClass() throws Exception {
 		ObjectDesc<Target> objectDesc = ObjectDescFactory.getObjectDesc(Target.class);
 		List<PropertyDesc> propertyDescs = objectDesc.getPropertyDescs();
@@ -32,11 +25,13 @@ public class ObjectDescTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testGetTargetClass() {
 		ObjectDesc<Bean> objectDesc = ObjectDescFactory.getObjectDesc(Bean.class);
 		assertEquals(Bean.class, objectDesc.getTargetClass());
 	}
 
+	@Test
 	public void testHasPropertyDesc() {
 		ObjectDesc<Bean> objectDesc = ObjectDescFactory.getObjectDesc(Bean.class);
 		assertTrue(objectDesc.hasPropertyDesc("foo"));
@@ -44,6 +39,7 @@ public class ObjectDescTest extends TestCase {
 		assertFalse(objectDesc.hasPropertyDesc("baz"));
 	}
 
+	@Test
 	public void testGetPropertyDescString() {
 		Bean bean = new Bean();
 		ObjectDesc<Bean> objectDesc = ObjectDescFactory.getObjectDesc(Bean.class);
@@ -57,6 +53,7 @@ public class ObjectDescTest extends TestCase {
 		assertEquals("val", barDesc.getValue(bean));
 	}
 
+	@Test
 	public void testGetPropertyDescStringPublicField() {
 		PublicFieldBean bean = new PublicFieldBean();
 		ObjectDesc<PublicFieldBean> objectDesc = ObjectDescFactory.getObjectDesc(PublicFieldBean.class);
@@ -74,6 +71,7 @@ public class ObjectDescTest extends TestCase {
 		assertEquals(10, (int)bazDesc.getValue(bean));
 	}
 
+	@Test
 	public void testGetPropertyDescNoException() {
 		ObjectDesc<Bean> objectDesc = ObjectDescFactory.getObjectDesc(Bean.class);
 		assertNotNull(objectDesc.getPropertyDescNoException("foo"));
@@ -81,11 +79,13 @@ public class ObjectDescTest extends TestCase {
 		assertNull(objectDesc.getPropertyDescNoException("baz"));
 	}
 
+	@Test
 	public void testGetPropertyDescSize() {
 		ObjectDesc<Bean> objectDesc = ObjectDescFactory.getObjectDesc(Bean.class);
 		assertEquals(2, objectDesc.getPropertyDescSize());
 	}
 
+	@Test
 	public void testGetPropertyDescInt() {
 		ObjectDesc<Bean> objectDesc = ObjectDescFactory.getObjectDesc(Bean.class);
 		if("foo".equals(objectDesc.getPropertyDesc(0).getPropertyName())) {
@@ -142,6 +142,7 @@ public class ObjectDescTest extends TestCase {
 
 	}
 
+	@Test
 	public void testToMapWithFields() throws Exception {
 		ToMapTarget target = new ToMapTarget();
 		ObjectDesc<ToMapTarget> objectDesc = ObjectDescFactory.getObjectDesc(target);

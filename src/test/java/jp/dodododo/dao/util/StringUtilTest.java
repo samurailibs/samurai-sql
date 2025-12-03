@@ -5,20 +5,13 @@ import static jp.dodododo.dao.util.StringUtil.*;
 import java.io.InputStream;
 import java.io.Reader;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class StringUtilTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+public class StringUtilTest {
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testDecamelize() {
 		assertEquals("I", decamelize("i"));
 		assertEquals("I", decamelize("I"));
@@ -27,6 +20,7 @@ public class StringUtilTest extends TestCase {
 		assertEquals("FOO_BAR", decamelize("fooBar"));
 	}
 
+	@Test
 	public void testCamelize() {
 		assertEquals("i", camelize("i"));
 		assertEquals("i", camelize("I"));
@@ -37,6 +31,7 @@ public class StringUtilTest extends TestCase {
 		assertEquals("foobar", camelize("FooBar"));
 	}
 
+	@Test
 	public void testCapitalize() {
 		assertEquals("I", capitalize("i"));
 		assertEquals("I", capitalize("I"));
@@ -48,6 +43,7 @@ public class StringUtilTest extends TestCase {
 		assertEquals("FOOBar", capitalize("FOOBar"));
 	}
 
+	@Test
 	public void testDecapitalize() {
 		assertEquals("i", decapitalize("i"));
 		assertEquals("i", decapitalize("I"));
@@ -59,6 +55,7 @@ public class StringUtilTest extends TestCase {
 		assertEquals("FOOBar", decapitalize("FOOBar"));
 	}
 
+	@Test
 	public void testTrimLine() {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		InputStream is = loader.getResourceAsStream("jp/dodododo/dao/util/big.txt");
@@ -67,6 +64,7 @@ public class StringUtilTest extends TestCase {
 		assertEquals("big", StringUtil.trimLine(text));
 	}
 
+	@Test
 	public void testLength() {
 		assertEquals(0, StringUtil.length(""));
 		assertEquals(8, StringUtil.length("aAzZ 190"));

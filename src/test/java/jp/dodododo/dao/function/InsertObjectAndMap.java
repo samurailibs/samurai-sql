@@ -2,7 +2,8 @@ package jp.dodododo.dao.function;
 
 import static jp.dodododo.dao.unit.UnitTestUtil.*;
 import static jp.dodododo.dao.util.DaoUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.types.TypeConverter;
 import jp.dodododo.dao.unit.DbTestExtension;

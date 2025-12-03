@@ -1,6 +1,6 @@
 package jp.dodododo.dao.issue;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import jp.dodododo.dao.types.JavaTypes.EnumType;
 import jp.dodododo.dao.unit.DbTestExtension;
 import jp.dodododo.dao.util.EnumConverter;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -23,7 +23,7 @@ public class Issue12Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
 	}

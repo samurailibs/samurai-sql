@@ -7,8 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import jp.dodododo.dao.message.Message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class ConstructorUtil {
 
-	private static final Log logger = LogFactory.getLog(ConstructorUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConstructorUtil.class);
 
 	public static <T> T newInstance(Constructor<T> constructor, Object... initArgs) {
 

@@ -20,14 +20,14 @@ import jp.dodododo.dao.util.CacheUtil;
 import jp.dodododo.dao.util.CaseInsensitiveMap;
 import jp.dodododo.dao.util.ConnectionUtil;
 import jp.dodododo.dao.util.DataSourceUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 @Internal
 public class TableMetaData {
 
-	private static final Log logger = LogFactory.getLog(TableMetaData.class);
+	private static final Logger logger = LoggerFactory.getLogger(TableMetaData.class);
 
 	private String tableName;
 

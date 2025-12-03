@@ -1,7 +1,8 @@
 package jp.dodododo.dao.issue;
 
 import static jp.dodododo.dao.unit.UnitTestUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.annotation.Table;
 import jp.dodododo.dao.exception.SQLRuntimeException;

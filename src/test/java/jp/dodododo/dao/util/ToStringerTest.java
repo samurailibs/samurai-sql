@@ -1,11 +1,11 @@
 package jp.dodododo.dao.util;
 
 import static jp.dodododo.dao.util.DaoUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ToStringerTest {
 

@@ -1,7 +1,7 @@
 package jp.dodododo.dao.io;
 
 import static jp.dodododo.dao.util.IOUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -15,7 +15,7 @@ import java.util.zip.GZIPOutputStream;
 import jp.dodododo.dao.types.TypeConverter;
 import jp.dodododo.dao.util.TmpFileUtil;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MultiInputStreamTest {
 

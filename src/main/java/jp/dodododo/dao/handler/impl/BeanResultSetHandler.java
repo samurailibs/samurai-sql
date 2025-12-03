@@ -55,8 +55,8 @@ import jp.dodododo.dao.util.StringUtil;
 import jp.dodododo.dao.util.TypesUtil;
 import jp.dodododo.dao.util.ZoneUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -64,7 +64,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 
-	private static final Log logger = LogFactory.getLog(BeanResultSetHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(BeanResultSetHandler.class);
 
 	private static final Map<Class<?>, List<PropertyDesc>> FOR_REL_PROPERTY_DESC_CACHE = CacheUtil.cacheMap();
 

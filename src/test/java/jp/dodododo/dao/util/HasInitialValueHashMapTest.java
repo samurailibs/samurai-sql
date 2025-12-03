@@ -1,6 +1,6 @@
 package jp.dodododo.dao.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
 import jp.dodododo.dao.util.HasInitialValueHashMap.ALF;
 import jp.dodododo.dao.util.HasInitialValueHashMap.HMF;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HasInitialValueHashMapTest {
 

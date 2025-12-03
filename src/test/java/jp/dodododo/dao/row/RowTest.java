@@ -1,6 +1,6 @@
 package jp.dodododo.dao.row;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -11,11 +11,11 @@ import jp.dodododo.dao.annotation.StringKey;
 import jp.dodododo.dao.config.DaoConfig;
 import jp.dodododo.dao.types.JavaTypes;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RowTest {
-	@Before
+	@BeforeEach
 	public void setup() {
 		DaoConfig.getDefaultConfig().setFormats("MM/dd yyyy");
 	}

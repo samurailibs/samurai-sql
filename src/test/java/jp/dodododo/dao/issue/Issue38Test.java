@@ -1,7 +1,7 @@
 package jp.dodododo.dao.issue;
 
 import static jp.dodododo.dao.unit.UnitTestUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.config.DaoConfig;
 import jp.dodododo.dao.unit.DbTestExtension;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -23,7 +23,7 @@ public class Issue38Test {
 
 	private Dao dao;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
 	}

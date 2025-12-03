@@ -2,7 +2,7 @@ package jp.dodododo.dao.issue;
 
 import static jp.dodododo.dao.unit.UnitTestUtil.*;
 import static jp.dodododo.dao.util.DaoUtil.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Connection;
 import java.util.Date;
@@ -60,8 +60,9 @@ public class Issue42Test {
 
 		emp = dao.selectOne(Emp.class, from("emp"), by("empno", emp.empno)).get();
 		assertNotNull(emp.empno);
-		assertTrue("" + start.getTime() + " : " + end.getTime() + " : " + emp.tstamp.getTime(),
-				start.getTime() <= emp.tstamp.getTime() && emp.tstamp.getTime() <= end.getTime());
+		assertTrue(
+				start.getTime() <= emp.tstamp.getTime() && emp.tstamp.getTime() <= end.getTime(),
+				start.getTime() + " : " + end.getTime() + " : " + emp.tstamp.getTime());
 		assertEquals(1, (int) emp.comm);
 	}
 

@@ -1,13 +1,13 @@
 package jp.dodododo.dao.unit;
 
 import jp.dodododo.dao.util.StringUtil;
-import junit.framework.ComparisonFailure;
+import org.opentest4j.AssertionFailedError;
 
 public class Assert {
 
 	public static void assertMatches(String message, String pattern, String actual) {
 		if (actual.matches(pattern) == false) {
-			throw new ComparisonFailure(message, pattern, actual);
+			throw new AssertionFailedError(message, pattern, actual);
 		}
 	}
 
@@ -17,7 +17,7 @@ public class Assert {
 	
 	public static void assertEqualsIgnoreCase(String message, String expected, String actual) {
 		if(StringUtil.equalsIgnoreCase(expected, actual) == false) {
-			throw new ComparisonFailure(message, expected, actual);
+			throw new AssertionFailedError(message, expected, actual);
 		}
 	}
 	

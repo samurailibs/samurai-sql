@@ -8,12 +8,12 @@ import java.lang.reflect.Method;
 import jp.dodododo.dao.exception.InvocationTargetRuntimeException;
 import jp.dodododo.dao.message.Message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MethodUtil {
 
-	private static final Log logger = LogFactory.getLog(MethodUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(MethodUtil.class);
 
 	@SuppressWarnings("unchecked")
 	public static <T> T invoke(Method method, Object target, Object... args) {

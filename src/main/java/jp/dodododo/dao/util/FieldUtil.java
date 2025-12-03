@@ -4,12 +4,12 @@ import java.lang.reflect.Field;
 
 import jp.dodododo.dao.message.Message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FieldUtil {
 
-	private static final Log logger = LogFactory.getLog(FieldUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(FieldUtil.class);
 
 	public static Object get(Field field, Object target) {
 

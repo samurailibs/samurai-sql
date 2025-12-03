@@ -18,10 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jp.dodododo.dao.config.DaoConfig;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TypeConverterTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
+public class TypeConverterTest {
+
+	@Test
 	public void testGet() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
 		TypeConverter typeConverter = new TypeConverter(map);
@@ -124,6 +127,7 @@ public class TypeConverterTest extends TestCase {
 		assertEquals("inputStream", newString(bytes2, "UTF-8").trim());
 	}
 
+	@Test
 	public void testConvert() throws Exception {
 		byte[] bytes = convert("abc", byte[].class);
 		assertEquals("abc", newString(bytes, "UTF-8").trim());
@@ -141,6 +145,7 @@ public class TypeConverterTest extends TestCase {
 		assertEquals(0, i);
 	}
 
+	@Test
 	public void testZone() {
 		ZoneId zoneId = convert(9, ZoneId.class);
 		assertEquals("+09:00", zoneId.getId());
@@ -161,6 +166,7 @@ public class TypeConverterTest extends TestCase {
 		assertEquals("+09:00", zoneOffset.getId());
 	}
 
+	@Test
 	public void testNumComma() {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("num", "1,000,000.000");
@@ -170,6 +176,7 @@ public class TypeConverterTest extends TestCase {
 		assertEquals(1000000, num);
 	}
 
+	@Test
 	public void testFormattedDate() {
 		DaoConfig.getDefaultConfig().setFormats(new String[0]);
 
@@ -194,6 +201,7 @@ public class TypeConverterTest extends TestCase {
 		assertEquals("20001122", new SimpleDateFormat("yyyyMMdd").format(calendar.getTime()));
 	}
 
+	@Test
 	public void testFormattedDate2() {
 		DaoConfig.getDefaultConfig().setFormats(new String[0]);
 
@@ -218,6 +226,7 @@ public class TypeConverterTest extends TestCase {
 		assertEquals("20001122", new SimpleDateFormat("yyyyMMdd").format(calendar.getTime()));
 	}
 
+	@Test
 	public void testFormattedDateByDefault() {
 		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy/MMdd", "yyyyMMdd");
 
@@ -242,6 +251,7 @@ public class TypeConverterTest extends TestCase {
 		assertEquals("20001122", new SimpleDateFormat("yyyyMMdd").format(calendar.getTime()));
 	}
 
+	@Test
 	public void testInputStreamToSomeType() throws Exception {
 		assertEquals(Integer.valueOf(0), TypeConverter.convert(new ByteArrayInputStream(new byte[] { 0 }), Integer.class));
 		assertEquals(Integer.valueOf(1), TypeConverter.convert(new ByteArrayInputStream(new byte[] { 1 }), Integer.class));
@@ -261,6 +271,7 @@ public class TypeConverterTest extends TestCase {
 		assertFalse(TypeConverter.convert(new ByteArrayInputStream("false".getBytes("UTF-8")), Boolean.class));
 	}
 
+	@Test
 	public void testSrc() {
 		assertEquals("1", src(1).to(String.class));
 		assertEquals(1000L, (long) src("1,000.00").to(Long.class));
@@ -270,6 +281,7 @@ public class TypeConverterTest extends TestCase {
 		assertEquals(0L, (long) src(null).to(Long.TYPE));
 	}
 
+	@Test
 	public void testVal() {
 		assertEquals("1", val(1).as(String.class));
 		assertEquals(1000L, (long) val("1,000.00").as(Long.class));

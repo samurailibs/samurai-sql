@@ -1,6 +1,6 @@
 package jp.dodododo.dao.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Connection;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package jp.dodododo.dao.sql.parse;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -8,19 +8,9 @@ import java.io.Reader;
 import jp.dodododo.dao.util.InputStreamReaderUtil;
 import jp.dodododo.dao.util.ReaderUtil;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SqlTokenizerTest {
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
 
 	@Test
 	public void testNext() {
