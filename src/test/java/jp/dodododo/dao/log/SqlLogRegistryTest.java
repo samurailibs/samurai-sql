@@ -1,7 +1,6 @@
 package jp.dodododo.dao.log;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import jp.dodododo.dao.object.ObjectDesc;
@@ -14,7 +13,6 @@ public class SqlLogRegistryTest {
 	public void dump() throws Exception {
 		SqlLogRegistry registry = SqlLogRegistry.getInstance();
 		for (int i = 0; i < 50; i++) {
-			System.out.println(LocalDateTime.now());
 			registry.add(newSqlLog());
 		}
 

@@ -43,15 +43,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -60,6 +52,7 @@ import javax.sql.DataSource;
 import jp.dodododo.dao.config.DaoConfig;
 import jp.dodododo.dao.exception.SQLRuntimeException;
 import jp.dodododo.dao.flyweight.FlyweightFactory;
+import jp.dodododo.dao.id.EntityId;
 import jp.dodododo.dao.util.BigDecimalUtil;
 import jp.dodododo.dao.util.CloseableUtil;
 import jp.dodododo.dao.util.EmptyUtil;
@@ -75,7 +68,7 @@ import jp.dodododo.dao.util.ZoneUtil;
 
 public class JavaTypes<T> implements JavaType<T> {
 
-	public static final JavaType<String> STRING = new JavaTypes<String>() {
+	public static final JavaType<String> STRING = new JavaTypes<>() {
 		@Override
 		protected String doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			return rs.getString(columnIndex);
@@ -117,13 +110,13 @@ public class JavaTypes<T> implements JavaType<T> {
 			} else if (value instanceof Byte[]) {
 				return StringUtil.newString(BYTE_ARRAY.convert(value), "UTF-8");
 			} else if (value instanceof InputStream) {
-				return doConvert(BYTE_ARRAY.convert((InputStream) value));
+				return doConvert(BYTE_ARRAY.convert(value));
 			}
 			return value.toString();
 		}
 	};
 
-	public static final JavaType<StringBuffer> STRING_BUFFER = new JavaTypes<StringBuffer>() {
+	public static final JavaType<StringBuffer> STRING_BUFFER = new JavaTypes<>() {
 		@Override
 		protected StringBuffer doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			String string = rs.getString(columnIndex);
@@ -151,7 +144,7 @@ public class JavaTypes<T> implements JavaType<T> {
 		}
 	};
 
-	public static final JavaType<StringBuilder> STRING_BUILDER = new JavaTypes<StringBuilder>() {
+	public static final JavaType<StringBuilder> STRING_BUILDER = new JavaTypes<>() {
 		@Override
 		protected StringBuilder doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			String string = rs.getString(columnIndex);
@@ -179,7 +172,7 @@ public class JavaTypes<T> implements JavaType<T> {
 		}
 	};
 
-	public static final JavaType<CharBuffer> CHAR_BUFFER = new JavaTypes<CharBuffer>() {
+	public static final JavaType<CharBuffer> CHAR_BUFFER = new JavaTypes<>() {
 		@Override
 		protected CharBuffer doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			String string = rs.getString(columnIndex);
@@ -207,7 +200,7 @@ public class JavaTypes<T> implements JavaType<T> {
 		}
 	};
 
-	public static final JavaType<Character> CHARACTER = new JavaTypes<Character>() {
+	public static final JavaType<Character> CHARACTER = new JavaTypes<>() {
 		@Override
 		protected Character doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			String string = rs.getString(columnIndex);
@@ -242,7 +235,7 @@ public class JavaTypes<T> implements JavaType<T> {
 	};
 
 	//
-	public static final JavaType<Character> PRIMITIVE_CHARACTER = new JavaTypes<Character>() {
+	public static final JavaType<Character> PRIMITIVE_CHARACTER = new JavaTypes<>() {
 		@Override
 		protected Character doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			Character v = CHARACTER.getValue(rs, columnIndex);
@@ -281,7 +274,7 @@ public class JavaTypes<T> implements JavaType<T> {
 		STRING_BOOLEAN_TABLE.put(Boolean.FALSE.toString().toLowerCase(), false);
 	}
 	//
-	public static final JavaType<Boolean> BOOLEAN = new JavaTypes<Boolean>() {
+	public static final JavaType<Boolean> BOOLEAN = new JavaTypes<>() {
 
 		@Override
 		protected Boolean doGetValue(ResultSet rs, int columnIndex) throws SQLException {
@@ -333,7 +326,7 @@ public class JavaTypes<T> implements JavaType<T> {
 	};
 
 	//
-	public static final JavaType<Boolean> PRIMITIVE_BOOLEAN = new JavaTypes<Boolean>() {
+	public static final JavaType<Boolean> PRIMITIVE_BOOLEAN = new JavaTypes<>() {
 		@Override
 		protected Boolean doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			Boolean v = BOOLEAN.getValue(rs, columnIndex);
@@ -359,7 +352,7 @@ public class JavaTypes<T> implements JavaType<T> {
 	};
 
 	//
-	public static final JavaType<Byte> BYTE = new JavaTypes<Byte>() {
+	public static final JavaType<Byte> BYTE = new JavaTypes<>() {
 		@Override
 		protected Byte doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			BigDecimal num = rs.getBigDecimal(columnIndex);
@@ -389,7 +382,7 @@ public class JavaTypes<T> implements JavaType<T> {
 	};
 
 	//
-	public static final JavaType<Byte> PRIMITIVE_BYTE = new JavaTypes<Byte>() {
+	public static final JavaType<Byte> PRIMITIVE_BYTE = new JavaTypes<>() {
 		@Override
 		protected Byte doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			Byte v = BYTE.getValue(rs, columnIndex);
@@ -415,7 +408,7 @@ public class JavaTypes<T> implements JavaType<T> {
 	};
 
 	//
-	public static final JavaType<Integer> INTEGER = new JavaTypes<Integer>() {
+	public static final JavaType<Integer> INTEGER = new JavaTypes<>() {
 		@Override
 		protected Integer doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			BigDecimal num = rs.getBigDecimal(columnIndex);
@@ -444,7 +437,7 @@ public class JavaTypes<T> implements JavaType<T> {
 		}
 	};
 	//
-	public static final JavaType<Integer> PRIMITIVE_INT = new JavaTypes<Integer>() {
+	public static final JavaType<Integer> PRIMITIVE_INT = new JavaTypes<>() {
 		@Override
 		protected Integer doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			Integer v = INTEGER.getValue(rs, columnIndex);
@@ -472,7 +465,7 @@ public class JavaTypes<T> implements JavaType<T> {
 		}
 	};
 	//
-	public static final JavaType<BigDecimal> BIG_DECIMAL = new JavaTypes<BigDecimal>() {
+	public static final JavaType<BigDecimal> BIG_DECIMAL = new JavaTypes<>() {
 		@Override
 		protected BigDecimal doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			BigDecimal num = rs.getBigDecimal(columnIndex);
@@ -511,7 +504,7 @@ public class JavaTypes<T> implements JavaType<T> {
 	};
 
 	//
-	public static final JavaType<BigInteger> BIG_INTEGER = new JavaTypes<BigInteger>() {
+	public static final JavaType<BigInteger> BIG_INTEGER = new JavaTypes<>() {
 		@Override
 		protected BigInteger doGetValue(ResultSet rs, int columnIndex) throws SQLException {
 			BigDecimal num = rs.getBigDecimal(columnIndex);
@@ -1732,6 +1725,65 @@ public class JavaTypes<T> implements JavaType<T> {
 				return URIUtil.toURL(((File) value).toURI());
 			}
 			throw new IllegalArgumentException();
+		}
+	};
+
+	public static final JavaType<EntityId> ENTITY_ID = new JavaTypes<>() {
+		@Override
+		protected EntityId doGetValue(ResultSet rs, int columnIndex) throws SQLException {
+			String string = rs.getString(columnIndex);
+			if (string == null) {
+				return null;
+			}
+			return new EntityId(string);
+		}
+
+		@Override
+		protected EntityId doGetValue(ResultSet rs, String columnLabel) throws SQLException {
+			String string = rs.getString(columnLabel);
+			if (string == null) {
+				return null;
+			}
+			return new EntityId(string);
+		}
+
+		@Override
+		protected EntityId doConvert(Object value) {
+			if (value == null) {
+				return null;
+			}
+			if(value instanceof EntityId) {
+				return (EntityId) value;
+			}
+			return new EntityId(STRING.convert(value));
+		}
+	};
+
+	public static final JavaType<java.util.UUID> UUID = new JavaTypes<>() {
+		@Override
+		protected java.util.UUID doGetValue(ResultSet rs, int columnIndex) throws SQLException {
+			String string = rs.getString(columnIndex);
+			if (string == null) {
+				return null;
+			}
+			return java.util.UUID.fromString(string);
+		}
+
+		@Override
+		protected java.util.UUID doGetValue(ResultSet rs, String columnLabel) throws SQLException {
+			String string = rs.getString(columnLabel);
+			if (string == null) {
+				return null;
+			}
+			return java.util.UUID.fromString(string);
+		}
+
+		@Override
+		protected java.util.UUID doConvert(Object value) {
+			if (value == null) {
+				return null;
+			}
+			return java.util.UUID.fromString(STRING.convert(value));
 		}
 	};
 

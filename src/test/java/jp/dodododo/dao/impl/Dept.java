@@ -1,5 +1,6 @@
 package jp.dodododo.dao.impl;
 
+import jp.dodododo.dao.annotation.Column;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -15,7 +16,6 @@ public class Dept {
 	private String VERSIONNO;
 
 	public Dept() {
-
 	}
 
 	public String getDEPTNO() {

@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.sql.DataSource;
 
+import jp.dodododo.dao.id.EntityId;
 import jp.dodododo.dao.types.JavaType;
 import jp.dodododo.dao.types.JavaTypes;
 import jp.dodododo.dao.types.SQLType;
@@ -52,6 +53,10 @@ public abstract class TypesUtil {
 	private static final Map<Class<?>, SQLType> SQL_TYPES = new HashMap<>();
 
 	private static final Map<Class<?>, JavaType<?>> JAVA_TYPES = new HashMap<>();
+
+	static {
+		addType(EntityId.class, SQLTypes.OBJECT, JavaTypes.ENTITY_ID);
+	}
 
 	static {
 		addType(Object.class, SQLTypes.OBJECT, JavaTypes.OBJECT);

@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import jp.dodododo.dao.id.EntityId;
 import jp.dodododo.dao.types.JavaType;
 import jp.dodododo.dao.types.JavaTypes;
 
@@ -38,7 +39,10 @@ public class TypesUtilTest {
 		assertEquals(JavaTypes.CLASS_LOADER, actual);
 
 		actual = TypesUtil.getJavaType(Thread.State.class);
-		assertEquals(new JavaTypes.EnumType<Thread.State>(Thread.State.class), actual);
+		assertEquals(new JavaTypes.EnumType<>(Thread.State.class), actual);
+
+		actual = TypesUtil.getJavaType(EntityId.class);
+		assertEquals(JavaTypes.ENTITY_ID, actual);
 
 		actual = TypesUtil.getJavaType(TypesUtil.class);
 		assertEquals(JavaTypes.OBJECT, actual);

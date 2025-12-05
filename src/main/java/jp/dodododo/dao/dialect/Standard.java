@@ -9,25 +9,26 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import jp.dodododo.dao.id.EntityId;
 import jp.dodododo.dao.metadata.ColumnMetaData;
 import jp.dodododo.dao.metadata.TableMetaData;
 import jp.dodododo.dao.object.PropertyDesc;
 import jp.dodododo.dao.paging.LimitOffset;
 import jp.dodododo.dao.util.ConnectionUtil;
 import jp.dodododo.dao.util.InputStreamUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Standard implements Dialect {
+	private static final Logger logger = LoggerFactory.getLogger(Standard.class);
 
     @Override
 	public String limitOffsetSql(String originalSQL, LimitOffset limitOffset) {
 		long offset = limitOffset.getOffset();
 		long limit = limitOffset.getLimit();
-		StringBuilder sqlBuf = new StringBuilder(originalSQL);
-		sqlBuf.append(" LIMIT ");
-		sqlBuf.append(limit);
-		sqlBuf.append(" OFFSET ");
-		sqlBuf.append(offset);
-		return sqlBuf.toString();
+		return originalSQL + //
+				" LIMIT " + limit + //
+				" OFFSET " + offset;
 	}
 
     @Override
@@ -89,10 +90,25 @@ public class Standard implements Dialect {
 
     @Override
 	public void setId(Object entity, PropertyDesc propertyDesc, Object idValue) {
+		logger.debug("called setId:{},{},{}", entity, propertyDesc, idValue);
 		if (idValue == null) {
 			return;
 		}
-		propertyDesc.setValue(entity, idValue);
+		if(propertyDesc.getPropertyType() == EntityId.class) {
+			logger.debug("property is EntityId :{},{},{}", entity, propertyDesc, idValue);
+			EntityId value = propertyDesc.getValue(entity);
+			logger.debug("EntityId instance id = {}", System.identityHashCode(value));
+			if (value == null && propertyDesc.isWritable()) {
+				value = new EntityId();
+				propertyDesc.setValue(entity, value);
+			}
+			if (value != null) {
+				logger.debug("EntityId#assign() :{},{},{}", entity, propertyDesc, idValue);
+				value.assign(idValue);
+			}
+		} else {
+			propertyDesc.setValue(entity, idValue);
+		}
 	}
 
     @Override

@@ -118,6 +118,11 @@ public class PropertyDesc implements AnnotatedElement {
 	}
 
 	private void setupReadableWritable(Field field) {
+		if (objectDesc.isRecord()) {
+			this.readable = true;
+			this.writable = false;
+			field.setAccessible(true);
+		}
 		Property p = field.getAnnotation(Property.class);
 		if (p != null) {
 			AccessMode accessMode = p.value();

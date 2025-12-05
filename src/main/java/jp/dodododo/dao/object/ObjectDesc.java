@@ -254,7 +254,6 @@ public class ObjectDesc<OBJ> {
 		if (propertyDesc == null) {
 			throw new NullPointerException("propertyDesc");
 		}
-
 		propertyDescTmpCache.put(propertyName, propertyDesc);
 		propertyDescTmpList.add(propertyDesc);
 	}
@@ -392,5 +391,9 @@ public class ObjectDesc<OBJ> {
 		List<PropertyDesc> propertyDescs = getPropertyDescs();
 		propertyDescs.stream().filter(pd -> pd.isReadable()).forEach(pd -> ret.put(pd.getPropertyName(), pd.getValue(obj)));
 		return ret;
+	}
+
+	public boolean isRecord() {
+		return this.targetClass.isRecord();
 	}
 }

@@ -4,10 +4,7 @@ import static jp.dodododo.dao.util.EmptyUtil.*;
 import static jp.dodododo.janerics.GenericsTypeUtil.*;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,6 +30,7 @@ import jp.dodododo.dao.columns.ResultSetColumn;
 import jp.dodododo.dao.commons.Null;
 import jp.dodododo.dao.exception.InstantiationRuntimeException;
 import jp.dodododo.dao.exception.NoParameterizedException;
+import jp.dodododo.dao.id.EntityId;
 import jp.dodododo.dao.impl.EmptyIterationCallback;
 import jp.dodododo.dao.lazyloading.LazyLoadingUtil;
 import jp.dodododo.dao.lazyloading.ProxyFactory;
@@ -93,7 +91,7 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		} else {
 			this.createMethod = createMethod;
 		}
-		if (isEmpty(createMethod) == true) {
+		if (isEmpty(createMethod)) {
 			validateBeanClass(beanClass);
 		}
 		this.beanClass = beanClass;
@@ -533,6 +531,7 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		List<Column> columnAnnotations = AnnotationUtil.getParameterAnnotations(constructor, Column.class);
 		List<Compress> compressAnnotations = AnnotationUtil.getParameterAnnotations(constructor, Compress.class);
 		List<Arg> argAnnotations = AnnotationUtil.getParameterAnnotations(constructor, Arg.class);
+		RecordComponent[] recordComponents = beanClass.getRecordComponents();
 		Map<Integer, String> paramNames = new HashMap<>();
 		Class<?>[] parameterTypes = constructor.getParameterTypes();
 		Annotation[][] parameterAnnotations = constructor.getParameterAnnotations();
@@ -572,29 +571,10 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 				processColumnAnnotation(i, column, compress, rs, resultSetColumnList, javaType, wrapperJavaType, initArgs, dbInitArgs, paramNames);
 			} else if (dbInitArgs[i] == null && arg != null && args.containsKey(argName)) {
 				processArgAnnotation(i, argName, args, parameterType, parameterWrapperType, initArgs, dbInitArgs, paramNames);
+			} else if (beanClass.isRecord() && JavaTypes.OBJECT != javaType) {
+				processColumn(i, compress, rs, resultSetColumnList, javaType, wrapperJavaType, initArgs, dbInitArgs, paramNames, List.of(recordComponents[i].getName()));
 			} else {
-				IterationCallback<?> callback = EmptyIterationCallback.getInstance();
-
-				Class<?> beanType = getBeanType(parameterType, parameterAnnotations[i]);
-				String createMethod = getCreateMethod(parameterType, parameterAnnotations[i]);
-				boolean nullableParameter = getNullable(parameterType, parameterAnnotations[i]);
-				BeanResultSetHandler<?> beanResultSetHandler = new BeanResultSetHandler(callback, beanType, createMethod, nullableParameter, args, connection);
-				try {
-					logger.trace(Message.getMessage("00049",  constructor, i, parameterType));
-					Object bean = beanResultSetHandler.createRow(rs, resultSetColumnList);
-					logger.trace(Message.getMessage("00050",  constructor, i, parameterType));
-					initArgs[i] = bean;
-					dbInitArgs[i] = bean;
-				} catch (SQLException e) {
-					logger.warn(Message.getMessage("00051",  constructor, i, parameterType.getSimpleName()), e);
-					initArgs[i] = null;
-					dbInitArgs[i] = null;
-				} catch (RuntimeException e) {
-					logger.warn(Message.getMessage("00051",  constructor, i, parameterType.getSimpleName()), e);
-					initArgs[i] = null;
-					dbInitArgs[i] = null;
-				}
-				paramNames.put(i, null);
+				processDefault(parameterType, parameterAnnotations, columnAnnotations, i, constructor, resultSetColumnList, args, initArgs, dbInitArgs, paramNames, rs);
 			}
 		}
 
@@ -619,6 +599,33 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		return bean;
 	}
 
+	protected <BEAN> void processDefault(Class<?> parameterType,Annotation[][] parameterAnnotations, List<Column> columnAnnotations,int i,Constructor<BEAN> constructor,List<ResultSetColumn> resultSetColumnList,Map<String, Object> args,Object[] initArgs,Object[] dbInitArgs,Map<Integer, String> paramNames,ResultSet rs) {
+		IterationCallback<?> callback = EmptyIterationCallback.getInstance();
+
+		if (parameterType.isAssignableFrom(EntityId.class)) {
+			return;
+		}
+		Class<?> beanType = getBeanType(parameterType, parameterAnnotations[i]);
+		String createMethod = getCreateMethod(parameterType, parameterAnnotations[i]);
+		boolean nullableParameter = getNullable(parameterType, parameterAnnotations[i]);
+		BeanResultSetHandler<?> beanResultSetHandler = new BeanResultSetHandler(callback, beanType, createMethod, nullableParameter, args, connection);
+		try {
+			logger.trace(Message.getMessage("00049",  constructor, i, parameterType));
+			Object bean = beanResultSetHandler.createRow(rs, resultSetColumnList);
+			logger.trace(Message.getMessage("00050",  constructor, i, parameterType));
+			initArgs[i] = bean;
+			dbInitArgs[i] = bean;
+		} catch (SQLException e) {
+			logger.warn(Message.getMessage("00051",  constructor, i, parameterType.getSimpleName()), e);
+			initArgs[i] = null;
+			dbInitArgs[i] = null;
+		} catch (RuntimeException e) {
+			logger.warn(Message.getMessage("00051",  constructor, i, parameterType.getSimpleName()), e);
+			initArgs[i] = null;
+			dbInitArgs[i] = null;
+		}
+		paramNames.put(i, null);
+	}
 	/**
 	 *
 	 * @return processed
@@ -650,10 +657,17 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 	 * @return processed
 	 */
 	protected boolean processColumnAnnotation(int index, Column column, Compress compress, ResultSet rs, List<ResultSetColumn> resultSetColumnList,
-			JavaType<?> javaType, JavaType<?> wrapperJavaType, Object[] initArgs, Object[] dbInitArgs, Map<Integer, String> paramNames)
+											  JavaType<?> javaType, JavaType<?> wrapperJavaType, Object[] initArgs, Object[] dbInitArgs, Map<Integer, String> paramNames)
+			throws SQLException {
+		List<String> columnNames = getColumnNames(column);
+		return processColumn(index, compress, rs, resultSetColumnList, javaType, wrapperJavaType, initArgs, dbInitArgs, paramNames, columnNames);
+
+	}
+
+	protected boolean processColumn(int index, Compress compress, ResultSet rs, List<ResultSetColumn> resultSetColumnList,
+			JavaType<?> javaType, JavaType<?> wrapperJavaType, Object[] initArgs, Object[] dbInitArgs, Map<Integer, String> paramNames, List<String> columnNames)
 			throws SQLException {
 		String columnName = null;
-		List<String> columnNames = getColumnNames(column);
 		for (String name : columnNames) {
 			String resultSetColumnName = getResultSetColumnName(resultSetColumnList, name);
 			if (resultSetColumnName == null) {
@@ -751,7 +765,7 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 
 	private static void validateCreateMethod(String createMethod, Class<?> beanType, Class<?> defaultBeanClass) {
 		if (isEmpty(createMethod) == false && isNullValue(beanType) == false || isNullValue(defaultBeanClass) == false) {
-			throw new IllegalStateException("Can not write both createMethod and defalutbeanClass.");
+			throw new IllegalStateException("Can not write both createMethod and defaultBeanClass.");
 		}
 	}
 
@@ -816,12 +830,15 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 				if (column != null || arg != null || isBeanClass(constructor.getParameterTypes()[i]) == true) {
 				} else {
 					usable = false;
-					logger.trace("[" + constructor + "], argIndex[" + i + "] has not @Column or type is not bean.");
+                    logger.trace("[{}], argIndex[{}] has not @Column or type is not bean.", constructor, i);
 					continue;
 				}
 			}
+			if(beanClass.isRecord()) {
+				usable = true;
+			}
 			if (usable == true) {
-				logger.trace("used constructor [" + constructor + "]");
+                logger.trace("used constructor [{}]", constructor);
 				USABLE_CONSTRUCTORS.put(targetClass, constructor);
 				return constructor;
 			}
@@ -831,7 +848,7 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 	}
 
 	private static boolean isBeanClass(Class<?> clazz) {
-		if (clazz.isArray() == true) {
+		if (clazz.isArray()) {
 			return false;
 		}
 		JavaType<?> javaType = TypesUtil.getJavaType(clazz);
