@@ -1,9 +1,6 @@
 package jp.dodododo.sql.flyweight;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import jp.dodododo.sql.types.JavaType;
 import jp.dodododo.sql.util.ThreadLocalCacheMap;
@@ -27,7 +24,7 @@ public class FlyweightFactory {
 		FlyweightFactory.factory = factory;
 	}
 
-	private static Map<Class<?>, Map<Object, Object>> cacheMap = new ThreadLocalCacheMap<>();
+	protected Map<Class<?>, Map<Object, Object>> cacheMap = new ThreadLocalCacheMap<>();
 
 	@SuppressWarnings("unchecked")
 	public <T> T getFlyweight(T value) {
@@ -39,11 +36,7 @@ public class FlyweightFactory {
 		if (Object.class.equals(javaType.getType())) {
 			return value;
 		}
-		Map<Object, Object> objects = cacheMap.get(clazz);
-		if (objects == null) {
-			objects = new HashMap<>();
-			cacheMap.put(clazz, objects);
-		}
+		Map<Object, Object> objects = cacheMap.computeIfAbsent(clazz, k -> new LruMap<>(1024, 0.75f, true));
 		Object key = value;
 		if (value instanceof Date) {
 			Date v = (Date) value;
@@ -64,6 +57,20 @@ public class FlyweightFactory {
 
 	public void clear() {
 		cacheMap.clear();
+	}
+
+
+	private static class LruMap<K, V> extends LinkedHashMap<K, V> {
+		private static final int MAX_ENTRIES = 1024;
+
+		LruMap(int initialCapacity, float loadFactor, boolean accessOrder) {
+			super(initialCapacity, loadFactor, accessOrder);
+		}
+
+		@Override
+		protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+			return size() > MAX_ENTRIES;
+		}
 	}
 
 }
