@@ -1,6 +1,6 @@
 package config;
 
-import jp.dodododo.dao.unit.DBConfig;
+import jp.dodododo.sql.unit.DBConfig;
 
 public class MysqlConfig implements DBConfig {
 
