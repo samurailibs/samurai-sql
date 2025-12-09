@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import jp.dodododo.dao.access.AccessMode;
 import jp.dodododo.dao.annotation.Bean;
+import jp.dodododo.dao.annotation.DaoEntity;
 import jp.dodododo.dao.annotation.Internal;
 import jp.dodododo.dao.annotation.Property;
 import jp.dodododo.dao.exception.IllegalPropertyRuntimeException;
@@ -28,10 +29,7 @@ import jp.dodododo.dao.object.aop.field.FieldAccess.AccessType;
 import jp.dodododo.dao.object.aop.field.FieldInterceptor;
 import jp.dodododo.dao.object.aop.field.FieldInterceptors;
 import jp.dodododo.dao.types.JavaType;
-import jp.dodododo.dao.util.MethodUtil;
-import jp.dodododo.dao.util.StringUtil;
-import jp.dodododo.dao.util.ThreadLocalUtil;
-import jp.dodododo.dao.util.TypesUtil;
+import jp.dodododo.dao.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +111,14 @@ public class PropertyDesc implements AnnotatedElement {
 		this.field = f;
 		setPropertyType(f.getType());
 		this.genericPropertyType = f.getGenericType();
+		DaoEntity daoEntity = objectDesc.getTargetClass().getAnnotation(DaoEntity.class);
+		if (daoEntity != null) {
+			if (!FieldUtil.isFinal(f)) {
+				writable = true;
+			}
+			readable = true;
+			f.setAccessible(true);
+		}
 
 		setupReadableWritable(f);
 	}

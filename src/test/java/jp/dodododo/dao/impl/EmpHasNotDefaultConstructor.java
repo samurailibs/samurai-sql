@@ -31,6 +31,8 @@ public class EmpHasNotDefaultConstructor {
 	}
 
 	public EmpHasNotDefaultConstructor(int EMPNO, String ENAME) {
+		this.EMPNO = String.valueOf(EMPNO);
+		this.ENAME = ENAME;
 	}
 
 	public String getCOMM() {

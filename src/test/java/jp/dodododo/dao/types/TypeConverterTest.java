@@ -26,7 +26,7 @@ public class TypeConverterTest {
 
 	@Test
 	public void testGet() throws Exception {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		TypeConverter typeConverter = new TypeConverter(map);
 
 		map.put("b1", "true");
@@ -109,13 +109,13 @@ public class TypeConverterTest {
 		map.put("is", "inputStream");
 		InputStream inputStream = typeConverter.getInputStream("is");
 		byte[] bytes = new byte[32];
-		((ByteArrayInputStream) inputStream).read(bytes);
+		inputStream.read(bytes);
 		assertEquals("inputStream", newString(bytes, "UTF-8").trim());
 
 		map.put("is2", "inputStream2".getBytes("UTF-8"));
 		InputStream inputStream2 = typeConverter.getInputStream("is2");
 		byte[] bytes2 = new byte[32];
-		((ByteArrayInputStream) inputStream2).read(bytes2);
+		inputStream2.read(bytes2);
 		assertEquals("inputStream2", newString(bytes2, "UTF-8").trim());
 
 		map.put("bytes", "bytes");
@@ -168,7 +168,7 @@ public class TypeConverterTest {
 
 	@Test
 	public void testNumComma() {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("num", "1,000,000.000");
 
 		TypeConverter converter = new TypeConverter(map);
@@ -180,7 +180,7 @@ public class TypeConverterTest {
 	public void testFormattedDate() {
 		DaoConfig.getDefaultConfig().setFormats(new String[0]);
 
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("date", "2000/11/22");
 
 		TypeConverter converter = new TypeConverter(map, "yyyy/MM/dd");
@@ -205,7 +205,7 @@ public class TypeConverterTest {
 	public void testFormattedDate2() {
 		DaoConfig.getDefaultConfig().setFormats(new String[0]);
 
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("date", "2000/1122");
 
 		TypeConverter converter = new TypeConverter(map, "yyyy/MM/dd", "yyyy/MMdd");
@@ -230,7 +230,7 @@ public class TypeConverterTest {
 	public void testFormattedDateByDefault() {
 		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy/MMdd", "yyyyMMdd");
 
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("date", "20001122");
 
 		TypeConverter converter = new TypeConverter(map);

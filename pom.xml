@@ -142,6 +142,9 @@
             <source>16</source>
             <target>16</target>
             <encoding>UTF-8</encoding>
+            <compilerArgs>
+              <arg>-parameters</arg>
+            </compilerArgs>
           </configuration>
         </plugin>
         <plugin>
@@ -219,7 +222,7 @@
     <dependency>
       <groupId>ognl</groupId>
       <artifactId>ognl</artifactId>
-      <version>3.2.7</version>
+      <version>3.3.5</version>
       <type>jar</type>
     </dependency>
     <dependency>

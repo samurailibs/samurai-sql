@@ -3,6 +3,8 @@ package jp.dodododo.dao.id;
 import jp.dodododo.dao.types.JavaTypes;
 import jp.dodododo.dao.types.TypeConverter;
 
+import java.util.UUID;
+
 /**
  * Holder for lazily assigned auto-increment IDs.
  *
@@ -110,5 +112,22 @@ public class EntityId {
             return "unassigned";
         }
         return asString();
+    }
+
+    public boolean isNumber() {
+        return value instanceof Number;
+    }
+
+    public boolean isUUID() {
+        try {
+            UUID.fromString(asString());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isString() {
+        return value instanceof CharSequence;
     }
 }

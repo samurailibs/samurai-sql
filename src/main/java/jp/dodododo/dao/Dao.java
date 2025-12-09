@@ -5,9 +5,9 @@ import jp.dodododo.dao.log.SqlLogRegistry;
 
 /**
  *
- * @author skimura
+ * @author Satoshi Kimura
  */
-public interface Dao extends SelectDao, ExecuteUpdateDao {
+public interface Dao extends SelectDao, ExecuteUpdateDao, SamuraiSqlClient {
 	SqlLogRegistry getSqlLogRegistry();
 
 	void setQueryTimeout(int seconds);

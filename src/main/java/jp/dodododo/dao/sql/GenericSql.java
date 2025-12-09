@@ -58,13 +58,13 @@ public enum GenericSql implements Sql {
 	INSERT_BATCH(
 			"INSERT INTO ${tableName} (<#list columns as c >${c.name}<#if c_has_next> ,</#if></#list>) VALUES <#list vals as val>(<#list columns as c >/*vals[${val_index}].${c.name}*/'dummy'<#if c_has_next> ,</#if></#list>) <#if val_has_next>,</#if> </#list>");
 
-	private String sqlTemplate;
+	private final String sqlTemplate;
 
-	private GenericSql(String sqlTemplate) {
+	GenericSql(String sqlTemplate) {
 		this.sqlTemplate = sqlTemplate;
 	}
 
-	private GenericSql(GenericSql genericSql) {
+	GenericSql(GenericSql genericSql) {
 		this(genericSql.sqlTemplate);
 	}
 

@@ -534,6 +534,7 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		RecordComponent[] recordComponents = beanClass.getRecordComponents();
 		Map<Integer, String> paramNames = new HashMap<>();
 		Class<?>[] parameterTypes = constructor.getParameterTypes();
+		Parameter[] parameters = constructor.getParameters();
 		Annotation[][] parameterAnnotations = constructor.getParameterAnnotations();
 		Object[] initArgs = new Object[parameterTypes.length];
 		Object[] dbInitArgs = new Object[parameterTypes.length];
@@ -543,6 +544,7 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 			Class<?> wrapperType = javaType.getWrapperType();
 			Class<?> parameterWrapperType = javaType.getWrapperType()==null? parameterType:wrapperType;
 			JavaType<?> wrapperJavaType = TypesUtil.getJavaType(parameterWrapperType);
+			String constructorArgName = parameters[i].getName();
 			Column column = columnAnnotations.get(i);
 			Compress compress = compressAnnotations.get(i);
 			Arg arg = argAnnotations.get(i);
@@ -571,8 +573,10 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 				processColumnAnnotation(i, column, compress, rs, resultSetColumnList, javaType, wrapperJavaType, initArgs, dbInitArgs, paramNames);
 			} else if (dbInitArgs[i] == null && arg != null && args.containsKey(argName)) {
 				processArgAnnotation(i, argName, args, parameterType, parameterWrapperType, initArgs, dbInitArgs, paramNames);
-			} else if (beanClass.isRecord() && JavaTypes.OBJECT != javaType) {
+			} else if (beanClass.isRecord() && JavaTypes.OBJECT != javaType && JavaTypes.COLLECTION != javaType) {
 				processColumn(i, compress, rs, resultSetColumnList, javaType, wrapperJavaType, initArgs, dbInitArgs, paramNames, List.of(recordComponents[i].getName()));
+			} else if (!constructorArgName.startsWith("arg") && JavaTypes.OBJECT != javaType && JavaTypes.COLLECTION != javaType) {
+				processColumn(i, compress, rs, resultSetColumnList, javaType, wrapperJavaType, initArgs, dbInitArgs, paramNames, List.of(constructorArgName));
 			} else {
 				processDefault(parameterType, parameterAnnotations, columnAnnotations, i, constructor, resultSetColumnList, args, initArgs, dbInitArgs, paramNames, rs);
 			}
@@ -822,16 +826,17 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 
 		for (Constructor<T> constructor : constructors) {
 			boolean usable = true;
+			Parameter[] parameters = constructor.getParameters();
 			List<Column> columnAnnotations = AnnotationUtil.getParameterAnnotations(constructor, Column.class);
 			List<Arg> argAnnotations = AnnotationUtil.getParameterAnnotations(constructor, Arg.class);
-			for (int i = 0; i < columnAnnotations.size(); i++) {
+			for (int i = 0; i < parameters.length; i++) {
+				String name = parameters[i].getName();
 				Column column = columnAnnotations.get(i);
 				Arg arg = argAnnotations.get(i);
-				if (column != null || arg != null || isBeanClass(constructor.getParameterTypes()[i]) == true) {
+				if (!name.startsWith("arg") || column != null || arg != null || isBeanClass(constructor.getParameterTypes()[i]) == true) {
 				} else {
 					usable = false;
                     logger.trace("[{}], argIndex[{}] has not @Column or type is not bean.", constructor, i);
-					continue;
 				}
 			}
 			if(beanClass.isRecord()) {

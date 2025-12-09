@@ -22,9 +22,9 @@ public class BeanResultSetHandlerTest {
 	public void testGetUsableConstructor() {
 		Class<Target> targetClass = Target.class;
 		List<Constructor<Target>> constructors = ClassUtil.getConstructors(targetClass, Modifier.PUBLIC);
-		List<ResultSetColumn> resultSetColumnList = new ArrayList<ResultSetColumn>();
+		List<ResultSetColumn> resultSetColumnList = new ArrayList<>();
 		Constructor<Target> constructor = BeanResultSetHandler.getUsableConstructor(targetClass, constructors, resultSetColumnList, targetClass);
-		assertEquals(2, constructor.getParameterTypes().length);
+		assertEquals(3, constructor.getParameterTypes().length);
 	}
 
 	@Test

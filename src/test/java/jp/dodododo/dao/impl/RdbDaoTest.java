@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.sql.DataSource;
 
 import jp.dodododo.dao.Dao;
-import jp.dodododo.dao.Each;
 import jp.dodododo.dao.annotation.Column;
 import jp.dodododo.dao.annotation.Columns;
 import jp.dodododo.dao.annotation.Dialects;
@@ -58,6 +57,9 @@ import org.slf4j.LoggerFactory;
 
 
 public class RdbDaoTest {
+
+	// TODO テストクラス分割
+	// TODO クラス名に合わせたテーブル名にする(EMPなどは残しておく)
 
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
@@ -116,7 +118,7 @@ public class RdbDaoTest {
 
 		EmpHasNotDefaultConstructor emp = list.get(0);
 		assertEquals("7934", emp.getEMPNO());
-		assertNull(emp.getENAME());
+		assertEquals("MILLER", emp.getENAME());
 		assertNull(emp.getTSTAMP());
 	}
 
@@ -883,12 +885,9 @@ public class RdbDaoTest {
 		String sql = "select * from EMP order by empno";
 		assertEquals(0, count.intValue());
 
-		dao.select(sql, Emp.class, new Each<Emp>() {
-			@Override
-			public void each(Emp it) {
-				count.set(count.intValue() + 1);
-				logger.debug("" + it);
-			}
+		dao.select(sql, Emp.class, emp -> {
+			count.set(count.intValue() + 1);
+			logger.debug("{}", emp);
 		});
 		assertEquals(14, count.intValue());
 	}
@@ -1263,7 +1262,7 @@ public class RdbDaoTest {
 
 		Long empNo = recordEmp.empno().asLong();
 
-		Optional<RecordEmp> recordEmp1 = dao.selectOne(RecordEmp.class, from(RecordEmp.class), by("empno", empNo));
+		Optional<RecordEmp> recordEmp1 = dao.selectOne(RecordEmp.class, by("empno", empNo));
 		recordEmp1.ifPresentOrElse(emp -> {
 			assertTrue(emp.empno().isAssigned());
 			assertEquals(recordEmp.empno().asLong(), emp.empno().asLong());
@@ -1273,8 +1272,45 @@ public class RdbDaoTest {
 			assertEquals(recordEmp.dept().getDEPTNO(), emp.dept().getDEPTNO());
 		},
 		IllegalStateException::new);
+
+		// use record in condition
+		RecordEmp condition = recordEmp;
+		Optional<RecordEmp> recordEmp2 = dao.selectOne(RecordEmp.class, condition);
+		recordEmp2.ifPresentOrElse(emp -> {
+					assertTrue(emp.empno().isAssigned());
+					assertEquals(recordEmp.empno().asLong(), emp.empno().asLong());
+					assertEquals("name1", emp.ename());
+					assertEquals("job2", emp.jobName());
+
+					assertEquals(recordEmp.dept().getDEPTNO(), emp.dept().getDEPTNO());
+				},
+				IllegalStateException::new);
+
 	}
 
+	@Test
+	public void testDaoEntity()throws Exception {
+		dao = newTestDao(getConnection());
+		Dept dept = new Dept();
+		dept.setDEPTNO("10");
+		EmpWithDaoEntity emp = new EmpWithDaoEntity( "name1",  dept);
+		emp.init("ename1", "job2", "1");
+		dao.insert(emp);
+
+		assertTrue(Long.valueOf(emp.getEmpNo()) > 0);
+
+		String empNo = emp.getEmpNo();
+
+		Optional<EmpWithDaoEntity> savedEmp = dao.selectOne(EmpWithDaoEntity.class, by("empno", empNo));
+		savedEmp.ifPresentOrElse(e -> {
+					assertEquals(Long.valueOf(emp.getEmpNo()), Long.valueOf(e.getEmpNo()));
+					assertEquals("ename1", e.ename());
+					assertEquals("job2", e.jobName());
+
+					assertEquals(emp.dept().getDEPTNO(), e.dept().getDEPTNO());
+				},
+				IllegalStateException::new);
+	}
 	public class _Dao extends RdbDao {
 		public _Dao() {
 			super();

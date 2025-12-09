@@ -36,7 +36,8 @@ public class EmpHasWritableField {
 		this.EMPNO = EMPNO;
 	}
 
-	public EmpHasWritableField(int EMPNO, String ENAME) {
+	public EmpHasWritableField(String EMPNO, String ENAME) {
+		this.EMPNO = EMPNO;
 	}
 
 	public String getCOMM() {

@@ -1,5 +1,9 @@
 package jp.dodododo.dao.util;
 
+import jp.dodododo.dao.id.EntityId;
+import jp.dodododo.dao.object.ObjectDesc;
+import jp.dodododo.dao.object.ObjectDescFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +15,12 @@ import java.util.Map;
 public abstract class CollectionOfString {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Map<String, Object> map(Object... map) {
-		Map<String, Object> ret = new CaseInsensitiveMap<>();
+		Map<String, Object> ret = new CaseInsensitiveMap<>(){
+			@Override
+			public Object put(String key, Object val) {
+				return super.put(key, normalize(val));
+			}
+		};
 		for (int i = 0; i < map.length; i++) {
 			Object o1 = map[i];
 			Object o2 = null;
@@ -21,6 +30,10 @@ public abstract class CollectionOfString {
 			if (o1 instanceof Map) {
 				Map tmpMap = (Map) o1;
 				ret.putAll(tmpMap);
+				continue;
+			}
+			if (o1 instanceof Record) {
+				putRecord(ret, o1);
 				continue;
 			}
 
@@ -38,7 +51,21 @@ public abstract class CollectionOfString {
 				ret.put(null, key);
 			}
 		}
+
 		return ret;
+	}
+
+	private static void putRecord(Map<String, Object> ret, Object record) {
+		ObjectDesc<Object> desc = ObjectDescFactory.getObjectDesc(record);
+		desc.getPropertyDescs().forEach(pd -> {
+			if (pd.isReadable()) {
+				ret.put(pd.getPropertyName(), pd.getValue(record));
+			}
+		});
+	}
+
+	private static Object normalize(Object v) {
+		return (v instanceof EntityId id) ? id.raw() : v;
 	}
 
 	public static List<String> list(String... list) {

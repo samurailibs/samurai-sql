@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import jp.dodododo.dao.Dao;
 import jp.dodododo.dao.dialect.Dialect;
-import jp.dodododo.dao.dialect.DialectManager;
 import jp.dodododo.dao.impl.RdbDao;
 
 public enum Identity implements IdGenerator {

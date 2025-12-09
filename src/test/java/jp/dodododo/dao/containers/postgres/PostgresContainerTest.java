@@ -19,7 +19,6 @@ import java.sql.Statement;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.function.Supplier;
 
 @Testcontainers
 class PostgresContainerTest {

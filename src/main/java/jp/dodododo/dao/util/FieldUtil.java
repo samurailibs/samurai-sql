@@ -1,6 +1,7 @@
 package jp.dodododo.dao.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import jp.dodododo.dao.message.Message;
 
@@ -43,4 +44,7 @@ public class FieldUtil {
 		}
 	}
 
+	public static boolean isFinal(Field f) {
+		return Modifier.isFinal(f.getModifiers());
+	}
 }

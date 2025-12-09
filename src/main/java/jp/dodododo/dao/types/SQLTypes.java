@@ -77,7 +77,7 @@ public enum SQLTypes implements SQLType {
 
 	private static final Map<Integer, SQLType> VALUES = new HashMap<>();
 
-	private SQLTypes(int type, Class<?> javaType, boolean isBinary) {
+	SQLTypes(int type, Class<?> javaType, boolean isBinary) {
 		init(type, javaType, isBinary);
 
 	}
