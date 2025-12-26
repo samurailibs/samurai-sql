@@ -19,7 +19,7 @@ import java.util.Optional;
 
 import jp.dodododo.sql.access.AccessMode;
 import jp.dodododo.sql.annotation.Bean;
-import jp.dodododo.sql.annotation.DaoEntity;
+import jp.dodododo.sql.annotation.SqlEntity;
 import jp.dodododo.sql.annotation.Internal;
 import jp.dodododo.sql.annotation.Property;
 import jp.dodododo.sql.exception.IllegalPropertyRuntimeException;
@@ -111,7 +111,7 @@ public class PropertyDesc implements AnnotatedElement {
 		this.field = f;
 		setPropertyType(f.getType());
 		this.genericPropertyType = f.getGenericType();
-		DaoEntity daoEntity = objectDesc.getTargetClass().getAnnotation(DaoEntity.class);
+		SqlEntity daoEntity = objectDesc.getTargetClass().getAnnotation(SqlEntity.class);
 		if (daoEntity != null) {
 			if (!FieldUtil.isFinal(f)) {
 				writable = true;

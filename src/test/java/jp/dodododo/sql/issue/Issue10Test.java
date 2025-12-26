@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import jp.dodododo.sql.Dao;
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.row.Row;
 import jp.dodododo.sql.types.TypeConverter;
 import jp.dodododo.sql.unit.DbTestExtension;
@@ -26,7 +26,7 @@ public class Issue10Test {
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
+		SqlConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
 	}
 
 	@Test

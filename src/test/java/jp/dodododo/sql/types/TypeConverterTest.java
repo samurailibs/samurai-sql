@@ -17,7 +17,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -178,7 +178,7 @@ public class TypeConverterTest {
 
 	@Test
 	public void testFormattedDate() {
-		DaoConfig.getDefaultConfig().setFormats(new String[0]);
+		SqlConfig.getDefaultConfig().setFormats(new String[0]);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("date", "2000/11/22");
@@ -203,7 +203,7 @@ public class TypeConverterTest {
 
 	@Test
 	public void testFormattedDate2() {
-		DaoConfig.getDefaultConfig().setFormats(new String[0]);
+		SqlConfig.getDefaultConfig().setFormats(new String[0]);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("date", "2000/1122");
@@ -228,7 +228,7 @@ public class TypeConverterTest {
 
 	@Test
 	public void testFormattedDateByDefault() {
-		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy/MMdd", "yyyyMMdd");
+		SqlConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy/MMdd", "yyyyMMdd");
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("date", "20001122");

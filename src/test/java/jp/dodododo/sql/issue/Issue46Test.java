@@ -3,7 +3,7 @@ package jp.dodododo.sql.issue;
 import static jp.dodododo.sql.sql.GenericSql.*;
 import static jp.dodododo.sql.sql.Operator.*;
 import static jp.dodododo.sql.unit.UnitTestUtil.*;
-import static jp.dodododo.sql.util.DaoUtil.*;
+import static jp.dodododo.sql.util.SqlUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;

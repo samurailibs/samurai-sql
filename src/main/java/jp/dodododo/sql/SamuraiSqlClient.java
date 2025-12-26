@@ -2,7 +2,7 @@ package jp.dodododo.sql;
 
 import jp.dodododo.sql.columns.NoPersistentColumns;
 import jp.dodododo.sql.columns.PersistentColumns;
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.exception.SQLRuntimeException;
 import jp.dodododo.sql.lock.Locking;
 import jp.dodododo.sql.log.SqlLogRegistry;
@@ -21,7 +21,7 @@ public interface SamuraiSqlClient {
 
     void setQueryTimeout(int seconds);
 
-    DaoConfig getConfig();
+    SqlConfig getConfig();
 
     <ROW> List<ROW> select(Class<ROW> returnType, Object... args);
 

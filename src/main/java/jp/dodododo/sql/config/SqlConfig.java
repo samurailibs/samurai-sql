@@ -1,8 +1,8 @@
 package jp.dodododo.sql.config;
 
-public class DaoConfig {
+public class SqlConfig {
 
-	protected static DaoConfig defaultConfig = new DaoConfig(true);
+	protected static SqlConfig defaultConfig = new SqlConfig(true);
 
 	private static final int DEFAULT_LOG_MAX_SIZE = 128;
 	private static final int DEFAULT_QUERY_TIMEOUT = -1;
@@ -21,7 +21,7 @@ public class DaoConfig {
 
 	private int queryTimeout = DEFAULT_QUERY_TIMEOUT;
 
-	public DaoConfig() {
+	public SqlConfig() {
 		this.logMaxSize = defaultConfig.logMaxSize;
 		this.encoding = defaultConfig.encoding;
 		this.longQuerySeconds = defaultConfig.longQuerySeconds;
@@ -30,7 +30,7 @@ public class DaoConfig {
 		this.queryTimeout = defaultConfig.queryTimeout;
 	}
 
-	private DaoConfig(boolean defaultConfig) {
+	private SqlConfig(boolean defaultConfig) {
 	}
 
 	public int getLogMaxSize() {
@@ -41,7 +41,7 @@ public class DaoConfig {
 		this.logMaxSize = logMaxSize;
 	}
 
-	public static DaoConfig getDefaultConfig() {
+	public static SqlConfig getDefaultConfig() {
 		return defaultConfig;
 	}
 

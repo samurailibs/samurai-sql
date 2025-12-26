@@ -1,12 +1,12 @@
 package jp.dodododo.sql.issue;
 
-import static jp.dodododo.sql.util.DaoUtil.*;
+import static jp.dodododo.sql.util.SqlUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.row.Row;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,7 @@ public class Issue8Test {
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss");
+		SqlConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss");
 	}
 
 	@Test

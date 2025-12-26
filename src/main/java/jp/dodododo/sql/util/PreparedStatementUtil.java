@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.exception.SQLRuntimeException;
 import jp.dodododo.sql.log.SlowQuery;
 import jp.dodododo.sql.log.SqlLogRegistry;
@@ -63,7 +63,7 @@ public abstract class PreparedStatementUtil extends StatementUtil {
 			ResultSet resultSet = ps.executeQuery();
 			double end = System.currentTimeMillis();
 			double time = (end - start) / 1000D;
-			if (DaoConfig.getDefaultConfig().getLongQuerySeconds() < time) {
+			if (SqlConfig.getDefaultConfig().getLongQuerySeconds() < time) {
 				SlowQuery.warn(time, sqlLogRegistry.getLast().getCompleteSql());
 			}
 			return resultSet;

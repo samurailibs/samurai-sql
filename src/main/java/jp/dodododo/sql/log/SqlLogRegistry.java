@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import java.util.Map;
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.util.EmptyUtil;
 import jp.dodododo.sql.util.ThreadLocalUtil;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ public class SqlLogRegistry {
 
 	private static final Logger logger = LoggerFactory.getLogger(SlowQuery.class);
 
-	protected DaoConfig config;
+	protected SqlConfig config;
 
 	private static final SqlLogRegistry INSTANCE = new SqlLogRegistry();
 
@@ -37,7 +37,7 @@ public class SqlLogRegistry {
 	 * デフォルトの上限サイズを使用してインスタンスを構築します。
 	 */
 	public SqlLogRegistry() {
-		this(DaoConfig.getDefaultConfig());
+		this(SqlConfig.getDefaultConfig());
 	}
 
 	/**
@@ -45,15 +45,15 @@ public class SqlLogRegistry {
 	 *
 	 * @param config config
 	 */
-	public SqlLogRegistry(DaoConfig config) {
+	public SqlLogRegistry(SqlConfig config) {
 		setConfig(config);
 	}
 
-	public void setConfig(DaoConfig config) {
+	public void setConfig(SqlConfig config) {
 		this.config = config;
 	}
 
-	public DaoConfig getConfig() {
+	public SqlConfig getConfig() {
 		return config;
 	}
 

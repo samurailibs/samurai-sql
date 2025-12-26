@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jp.dodododo.sql.annotation.StringKey;
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.types.JavaTypes;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class RowTest {
 	@BeforeEach
 	public void setup() {
-		DaoConfig.getDefaultConfig().setFormats("MM/dd yyyy");
+		SqlConfig.getDefaultConfig().setFormats("MM/dd yyyy");
 	}
 
 	@Test

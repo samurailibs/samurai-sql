@@ -1,6 +1,7 @@
 package jp.dodododo.sql.util;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -47,13 +48,15 @@ public abstract class ClassUtil {
 
 	public static <T> T newInstance(Class<T> clazz) {
 		try {
-			return clazz.newInstance();
-		} catch (InstantiationException e) {
+			Constructor<T> constructor = clazz.getConstructor();
+			return constructor.newInstance();
+//			return clazz.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(clazz.toString(), e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(clazz.toString(), e);
-		}
-	}
+		} catch (NoSuchMethodException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 	public static <T> List<Constructor<T>> getPublicConstructors(Class<T> clazz) {
 		return getConstructors(clazz, Modifier.PUBLIC);

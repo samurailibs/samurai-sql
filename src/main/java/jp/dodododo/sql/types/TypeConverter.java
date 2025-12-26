@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.exception.PropertyNotFoundRuntimeException;
 import jp.dodododo.sql.object.ObjectDesc;
 import jp.dodododo.sql.object.ObjectDescFactory;
@@ -38,7 +38,7 @@ public class TypeConverter {
 	protected String[] formats;
 
 	public TypeConverter(Object beanOrMap) {
-		this(beanOrMap, DaoConfig.getDefaultConfig().getFormats());
+		this(beanOrMap, SqlConfig.getDefaultConfig().getFormats());
 	}
 
 	public TypeConverter(Object beanOrMap, String... formats) {

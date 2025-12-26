@@ -2,7 +2,7 @@ package jp.dodododo.sql.sql;
 
 import static jp.dodododo.sql.sql.GenericSql.*;
 import static jp.dodododo.sql.unit.UnitTestUtil.*;
-import static jp.dodododo.sql.util.DaoUtil.*;
+import static jp.dodododo.sql.util.SqlUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Types;
@@ -20,7 +20,6 @@ import jp.dodododo.sql.impl.Emp;
 import jp.dodododo.sql.unit.DbTestExtension;
 import jp.dodododo.sql.value.ParameterValue;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -190,7 +189,6 @@ public class GenericSqlTest {
 		assertEquals("ROD", two.getENAME());
 	}
 
-	@Disabled
 	@Test
 	public void testGetSql_REPLACE() {
 		String tableName = "emp";
@@ -198,14 +196,10 @@ public class GenericSqlTest {
 		columns.add(new ParameterValue("emp_id", Types.INTEGER, 10, true));
 		columns.add(new ParameterValue("emp_name", Types.VARCHAR, "name", true));
 		Class<?> queryClass = null;
-		Dialect dialect = null;//new MySQL();
+
+		Dialect dialect = new SQLite();
 		SqlContext context = new SqlContext(tableName, columns, queryClass, dialect);
 		String sql = GenericSql.REPLACE.getSql(context);
-		assertEquals("INSERT INTO emp (emp_id ,emp_name) VALUES (/*emp_id*/'dummy' ,/*emp_name*/'dummy') ON DUPLICATE KEY UPDATE", sql);
-
-		dialect = new SQLite();
-		context = new SqlContext(tableName, columns, queryClass, dialect);
-		sql = GenericSql.REPLACE.getSql(context);
 		assertEquals("INSERT OR REPLACE INTO emp (emp_id ,emp_name) VALUES (/*emp_id*/'dummy' ,/*emp_name*/'dummy')", sql);
 	}
 

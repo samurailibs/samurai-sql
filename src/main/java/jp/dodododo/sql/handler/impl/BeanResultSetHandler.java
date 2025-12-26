@@ -46,7 +46,7 @@ import jp.dodododo.sql.util.AnnotationUtil;
 import jp.dodododo.sql.util.CacheUtil;
 import jp.dodododo.sql.util.CaseInsensitiveSet;
 import jp.dodododo.sql.util.ConstructorUtil;
-import jp.dodododo.sql.util.DaoUtil;
+import jp.dodododo.sql.util.SqlUtil;
 import jp.dodododo.sql.util.EmptyUtil;
 import jp.dodododo.sql.util.OgnlUtil;
 import jp.dodododo.sql.util.StringUtil;
@@ -504,7 +504,7 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		}
 
 		if (JavaTypes.OBJECT.equals(TypesUtil.getJavaType(beanClass)) == false && pd != null) {
-			String columnName = DaoUtil.getColumnName(pd);
+			String columnName = SqlUtil.getColumnName(pd);
 			if (contains(resultSetColumnList, columnName) == false) {
 				return null;
 			}

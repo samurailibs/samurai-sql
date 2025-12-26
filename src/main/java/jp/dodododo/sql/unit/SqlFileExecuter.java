@@ -10,7 +10,7 @@ import jp.dodododo.sql.handler.ResultSetHandler;
 import jp.dodododo.sql.handler.impl.MapResultSetHandler;
 import jp.dodododo.sql.impl.EmptyIterationCallback;
 import jp.dodododo.sql.impl.RdbDao;
-import jp.dodododo.sql.util.DaoUtil;
+import jp.dodododo.sql.util.SqlUtil;
 import jp.dodododo.sql.value.ParameterValue;
 
 public class SqlFileExecuter {
@@ -24,7 +24,7 @@ public class SqlFileExecuter {
 		RdbDao dao = new RdbDao(connection);
 		IterationCallback<Map<String, Object>> callback = EmptyIterationCallback.getInstance();
 		ResultSetHandler<Map<String, Object>> handler = new MapResultSetHandler(callback);
-		Map<String, Object> arg = DaoUtil.args();
+		Map<String, Object> arg = SqlUtil.args();
 		return dao.select(sqlFilePath, arg, callback, handler, false);
 	}
 

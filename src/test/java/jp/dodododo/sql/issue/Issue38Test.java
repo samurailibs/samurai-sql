@@ -9,7 +9,7 @@ import java.util.List;
 
 import jp.dodododo.sql.Dao;
 import jp.dodododo.sql.annotation.Column;
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.unit.DbTestExtension;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ public class Issue38Test {
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
+		SqlConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
 	}
 
 	@Test

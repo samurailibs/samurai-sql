@@ -2,25 +2,25 @@ package jp.dodododo.sql.exception;
 
 import jp.dodododo.sql.message.Message;
 
-public class DaoRuntimeException extends RuntimeException {
+public class MissingPrimaryKeyValueException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	protected String messageCode;
 
-	public DaoRuntimeException() {
+	public MissingPrimaryKeyValueException() {
 		super();
 	}
 
-	public DaoRuntimeException(String messageCode, Object... args) {
+	public MissingPrimaryKeyValueException(String messageCode, Object... args) {
 		super(Message.getMessage(messageCode, args));
 		this.messageCode = messageCode;
 	}
 
-	public DaoRuntimeException(Throwable cause, String messageCode, Object... args) {
+	public MissingPrimaryKeyValueException(Throwable cause, String messageCode, Object... args) {
 		super(Message.getMessage(messageCode, args), cause);
 	}
 
-	public DaoRuntimeException(Throwable cause) {
+	public MissingPrimaryKeyValueException(Throwable cause) {
 		super(cause);
 	}
 

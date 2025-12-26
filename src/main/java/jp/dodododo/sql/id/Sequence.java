@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.dialect.Dialect;
-import jp.dodododo.sql.impl.RdbDao;
+import jp.dodododo.sql.impl.SamuraiSqlClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +20,8 @@ public enum Sequence implements IdGenerator {
 	@Override
 	public Object generate(Connection connection, PreparedStatement ps, Dialect dialect, String sequenceName) {
 		String sql = dialect.sequenceNextValSql(sequenceName);
-		Dao dao = new RdbDao(connection);
-		Optional<Map<String, Object>> result = dao.selectOneMap(sql);
+		SamuraiSqlClient client = new SamuraiSqlClientImpl(connection);
+		Optional<Map<String, Object>> result = client.selectOneMap(sql);
 		Collection<Object> values = result.get().values();
 		logger.debug("values : {}", values);
 		return values.iterator().next();

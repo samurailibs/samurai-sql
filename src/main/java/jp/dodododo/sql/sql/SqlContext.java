@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jp.dodododo.sql.DaoConstants;
+import jp.dodododo.sql.SqlConstants;
 import jp.dodododo.sql.dialect.Dialect;
 import jp.dodododo.sql.object.ObjectDesc;
 import jp.dodododo.sql.object.ObjectDescFactory;
-import jp.dodododo.sql.util.DaoUtil;
+import jp.dodododo.sql.util.SqlUtil;
 import jp.dodododo.sql.value.ParameterValue;
 
 public class SqlContext implements Serializable {
@@ -40,7 +40,7 @@ public class SqlContext implements Serializable {
 	}
 
 	private void init() {
-		addParameter(DaoConstants.ORDER_BY, Collections.EMPTY_LIST);
+		addParameter(SqlConstants.ORDER_BY, Collections.EMPTY_LIST);
 		columns.forEach(parameterValue -> {
 			String name = parameterValue.getName();
 			Object value = parameterValue.getValue();
@@ -90,7 +90,7 @@ public class SqlContext implements Serializable {
 		if (values == null || values.isEmpty()) {
 			return;
 		}
-		addParameter(DaoUtil.VALUES, values);
+		addParameter(SqlUtil.VALUES, values);
 		ObjectDesc<?> objectDesc = ObjectDescFactory.getObjectDesc(values.get(0));
 		values.forEach(object -> {
 			Object map = objectDesc.toMap(object);

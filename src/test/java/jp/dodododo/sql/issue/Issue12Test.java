@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 import jp.dodododo.sql.annotation.NumKey;
 import jp.dodododo.sql.annotation.StringKey;
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.types.JavaTypes.EnumType;
 import jp.dodododo.sql.unit.DbTestExtension;
 import jp.dodododo.sql.util.EnumConverter;
@@ -25,7 +25,7 @@ public class Issue12Test {
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		DaoConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
+		SqlConfig.getDefaultConfig().setFormats("yyyy/MM/dd", "yyyy-MM-dd");
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 package jp.dodododo.sql.impl;
 
-import jp.dodododo.sql.annotation.DaoEntity;
+import jp.dodododo.sql.annotation.SqlEntity;
 import jp.dodododo.sql.annotation.Id;
 import jp.dodododo.sql.annotation.IdDefSet;
 import jp.dodododo.sql.annotation.Table;
@@ -12,8 +12,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 @Table("emp")
-@DaoEntity
-public class EmpWithDaoEntity {
+@SqlEntity
+public class EmpWithSqlEntity {
 	@Id({@IdDefSet(strategy = Sequence.class, name = "sequence", db = HSQL.class)})
 	private String empno;
 
@@ -33,7 +33,7 @@ public class EmpWithDaoEntity {
 
 	private String tstamp;
 
-	public EmpWithDaoEntity(String empno, Dept dept) {
+	public EmpWithSqlEntity(String empno, Dept dept) {
 		this.empno = empno;
 		this.dept = dept;
 	}
@@ -44,7 +44,7 @@ public class EmpWithDaoEntity {
 		this.mgr = mgr;
 	}
 
-	public EmpWithDaoEntity() {
+	public EmpWithSqlEntity() {
 	}
 
 	@Override

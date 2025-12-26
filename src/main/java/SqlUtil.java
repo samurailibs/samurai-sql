@@ -3,5 +3,5 @@
  *
  * @author Satoshi Kimura
  */
-public abstract class SqlUtil extends jp.dodododo.sql.util.SqlUtil {
+public abstract class SqlUtil extends jp.dodododo.sql.util.InternalSqlUtil {
 }

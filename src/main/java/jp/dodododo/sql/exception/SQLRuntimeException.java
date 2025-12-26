@@ -2,13 +2,13 @@ package jp.dodododo.sql.exception;
 
 import java.sql.SQLException;
 import jp.dodododo.sql.log.SqlLogRegistry;
-import jp.dodododo.sql.properties.SamuraiDaoProperties;
+import jp.dodododo.sql.properties.SamuraiSqlProperties;
 
 public class SQLRuntimeException extends RuntimeException {
 	private static final long serialVersionUID = 1169720528755756483L;
 
 	{
-		boolean enableSqlDump = SamuraiDaoProperties.enableSqlDump();
+		boolean enableSqlDump = SamuraiSqlProperties.enableSqlDump();
 		if (enableSqlDump == true) {
 			SqlLogRegistry.getInstance().dump();
 		}

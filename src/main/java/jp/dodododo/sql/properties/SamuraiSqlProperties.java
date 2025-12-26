@@ -4,12 +4,12 @@ import java.util.Properties;
 import jp.dodododo.sql.types.JavaTypes;
 import jp.dodododo.sql.util.PropertiesUtil;
 
-public class SamuraiDaoProperties {
+public class SamuraiSqlProperties {
 	private static Properties properties;
 
 	static {
 		try {
-			properties = PropertiesUtil.getProperties("samurai-dao.properties");
+			properties = PropertiesUtil.getProperties("samurai-sql.properties");
 		} catch (RuntimeException e) {
 			properties = new Properties();
 		}

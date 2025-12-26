@@ -5,7 +5,7 @@ import static jp.dodododo.sql.sql.Operator.*;
 import static jp.dodododo.sql.sql.orderby.SortType.*;
 import static jp.dodododo.sql.unit.Assert.*;
 import static jp.dodododo.sql.unit.UnitTestUtil.*;
-import static jp.dodododo.sql.util.DaoUtil.*;
+import static jp.dodododo.sql.util.SqlUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
@@ -1293,7 +1293,7 @@ public class RdbDaoTest {
 		dao = newTestClient(getConnection());
 		Dept dept = new Dept();
 		dept.setDEPTNO("10");
-		EmpWithDaoEntity emp = new EmpWithDaoEntity( "name1",  dept);
+		EmpWithSqlEntity emp = new EmpWithSqlEntity( "name1",  dept);
 		emp.init("ename1", "job2", "1");
 		dao.insert(emp);
 
@@ -1301,7 +1301,7 @@ public class RdbDaoTest {
 
 		String empNo = emp.getEmpNo();
 
-		Optional<EmpWithDaoEntity> savedEmp = dao.selectOne(EmpWithDaoEntity.class, by("empno", empNo));
+		Optional<EmpWithSqlEntity> savedEmp = dao.selectOne(EmpWithSqlEntity.class, by("empno", empNo));
 		savedEmp.ifPresentOrElse(e -> {
 					assertEquals(Long.valueOf(emp.getEmpNo()), Long.valueOf(e.getEmpNo()));
 					assertEquals("ename1", e.ename());

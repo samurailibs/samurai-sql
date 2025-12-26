@@ -4,7 +4,7 @@ import jp.dodododo.sql.annotation.Dialects;
 import jp.dodododo.sql.context.CommandContext;
 import jp.dodododo.sql.dialect.Dialect;
 import jp.dodododo.sql.dialect.HSQL;
-import jp.dodododo.sql.util.DaoUtil;
+import jp.dodododo.sql.util.SqlUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,13 +43,13 @@ public class AbstractNodeTest {
 
 		String expression = "foo.bar.baz";
 		String[] names = new String[] { "foo", "bar", "baz" };
-		Object root = DaoUtil.args("foo", new Foo());
+		Object root = SqlUtil.args("foo", new Foo());
 		Dialect dialect = null;
 		assertTrue(node.getValue(expression, names, root, dialect) instanceof Baz);
 
 		expression = "foo.bar.baz.foo";
 		names = new String[] { "foo", "bar", "baz", "foo" };
-		root = DaoUtil.args("foo", new Foo());
+		root = SqlUtil.args("foo", new Foo());
 		assertTrue(node.getValue(expression, names, root, dialect) instanceof Foo);
 	}
 
@@ -63,18 +63,18 @@ public class AbstractNodeTest {
 
 		String expression = "foo.d";
 		String[] names = new String[] { "foo", "d" };
-		Object root = DaoUtil.args("foo", new Foo());
+		Object root = SqlUtil.args("foo", new Foo());
 		Dialect dialect = new HSQL();
 		assertEquals("fooVal", node.getValue(expression, names, root, dialect));
 
 		expression = "foo.bar.d";
 		names = new String[] { "foo", "bar", "d" };
-		root = DaoUtil.args("foo", new Foo());
+		root = SqlUtil.args("foo", new Foo());
 		assertEquals("barVal", node.getValue(expression, names, root, dialect));
 
 		expression = "foo.bar.baz.d";
 		names = new String[] { "foo", "bar", "baz", "d" };
-		root = DaoUtil.args("foo", new Foo());
+		root = SqlUtil.args("foo", new Foo());
 		assertEquals("bazVal", node.getValue(expression, names, root, dialect));
 	}
 

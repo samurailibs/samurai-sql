@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.exception.SQLRuntimeException;
 import jp.dodododo.sql.flyweight.FlyweightFactory;
 import jp.dodododo.sql.id.EntityId;
@@ -1024,7 +1024,7 @@ public class JavaTypes<T> implements JavaType<T> {
 		@Deprecated
 		@Override
 		protected java.util.Date doConvert(Object value) {
-			return doConvert(value, DaoConfig.getDefaultConfig().getFormats());
+			return doConvert(value, SqlConfig.getDefaultConfig().getFormats());
 		}
 	};
 
@@ -2078,7 +2078,7 @@ public class JavaTypes<T> implements JavaType<T> {
 			if (bool != null) {
 				return BIG_DECIMAL.convert(bool);
 			}
-			Date date = toDate(s, false, DaoConfig.getDefaultConfig().getFormats());
+			Date date = toDate(s, false, SqlConfig.getDefaultConfig().getFormats());
 			if (date != null) {
 				return BIG_DECIMAL.convert(NUMBER.convert(date));
 			}

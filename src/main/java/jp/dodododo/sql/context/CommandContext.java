@@ -13,7 +13,7 @@ import jp.dodododo.sql.exception.ArgNotFoundException;
 import jp.dodododo.sql.message.Message;
 import jp.dodododo.sql.types.SQLTypes;
 import jp.dodododo.sql.util.CaseInsensitiveMap;
-import jp.dodododo.sql.util.DaoUtil;
+import jp.dodododo.sql.util.SqlUtil;
 import jp.dodododo.sql.value.ParameterValue;
 import ognl.OgnlRuntime;
 
@@ -137,7 +137,7 @@ public class CommandContext {
 
 	public void addValues(List<?> values) {
 		Map<String, ParameterValue> arg = new HashMap<>();
-		arg.put(DaoUtil.VALUES, new ParameterValue(DaoUtil.VALUES, SQLTypes.OBJECT.getType(), values, false));
+		arg.put(SqlUtil.VALUES, new ParameterValue(SqlUtil.VALUES, SQLTypes.OBJECT.getType(), values, false));
 		addArgs(arg);
 	}
 }

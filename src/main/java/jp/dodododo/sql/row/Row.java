@@ -8,7 +8,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.types.TypeConverter;
 
 public class Row {
@@ -16,7 +16,7 @@ public class Row {
 	protected TypeConverter typeConverter;
 
 	public Row(Object beanOrMap) {
-		this(beanOrMap, DaoConfig.getDefaultConfig().getFormats());
+		this(beanOrMap, SqlConfig.getDefaultConfig().getFormats());
 	}
 
 	public Row(Object beanOrMap, String... formats) {

@@ -11,7 +11,6 @@ import jp.dodododo.sql.id.Sequence;
 import jp.dodododo.sql.row.Row;
 import jp.dodododo.sql.types.TypeConverter;
 import jp.dodododo.sql.unit.DbTestExtension;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -24,7 +23,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 import static jp.dodododo.sql.unit.UnitTestUtil.newTestClient;
-import static jp.dodododo.sql.util.DaoUtil.args;
+import static jp.dodododo.sql.util.SqlUtil.args;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CompressTest {
@@ -286,7 +285,6 @@ public class CompressTest {
 		public InputStream binary = new ByteArrayInputStream("abcdefg".getBytes());
 	}
 
-	@Disabled
 	@Test
 	public void testZLIB_NO_COMPRESSION() throws Exception {
 		Dialect dialect = DialectManager.getDialect(getConnection());

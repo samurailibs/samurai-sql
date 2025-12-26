@@ -1,20 +1,20 @@
 package jp.dodododo.sql.impl;
 
 import jp.dodododo.sql.CRUD;
-import jp.dodododo.sql.DaoConstants;
+import jp.dodododo.sql.SqlConstants;
 import jp.dodododo.sql.IterationCallback;
 import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.*;
 import jp.dodododo.sql.columns.NoPersistentColumns;
 import jp.dodododo.sql.columns.PersistentColumns;
-import jp.dodododo.sql.config.DaoConfig;
+import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.context.CommandContext;
 import jp.dodododo.sql.dialect.Default;
 import jp.dodododo.sql.dialect.Dialect;
 import jp.dodododo.sql.dialect.DialectManager;
 import jp.dodododo.sql.dialect.Standard;
 import jp.dodododo.sql.empty_impl.DataSourceImpl;
-import jp.dodododo.sql.exception.DaoRuntimeException;
+import jp.dodododo.sql.exception.MissingPrimaryKeyValueException;
 import jp.dodododo.sql.exception.InvalidSQLException;
 import jp.dodododo.sql.exception.PropertyNotFoundRuntimeException;
 import jp.dodododo.sql.exception.SQLRuntimeException;
@@ -72,7 +72,7 @@ import static jp.dodododo.sql.sql.GenericSql.SIMPLE_COUNT_WHERE;
 import static jp.dodododo.sql.sql.GenericSql.SIMPLE_WHERE;
 import static jp.dodododo.sql.types.SQLTypes.*;
 import static jp.dodododo.sql.types.SQLTypes.BOOLEAN;
-import static jp.dodododo.sql.util.DaoUtil.*;
+import static jp.dodododo.sql.util.SqlUtil.*;
 import static jp.dodododo.sql.util.EmptyUtil.isEmpty;
 
 public class SamuraiSqlClientImpl implements SamuraiSqlClient {
@@ -96,7 +96,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
 
     protected String whereColumnPrefix;
 
-    protected DaoConfig config = new DaoConfig();
+    protected SqlConfig config = new SqlConfig();
 
     protected int queryTimeout;
 
@@ -170,7 +170,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
     @Override
     public int insert(String tableName, Object... entity) {
         ObjectDesc<Object> desc = ObjectDescFactory.getObjectDesc(entity[0]);
-        TableMetaData tableMetaData = getTableMetaData(DaoUtil.getTableName(desc.getTargetClass()));
+        TableMetaData tableMetaData = getTableMetaData(SqlUtil.getTableName(desc.getTargetClass()));
         List<PropertyDesc> propertyDescs = desc.getPropertyDescs();
         List<String> npc= new ArrayList<>();
         Dialect dialect = DialectManager.getDialect(dataSource);
@@ -229,7 +229,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
     }
 
     protected String getTableName(Object o, Connection connection) {
-        String tableName = DaoUtil.getTableName(o);
+        String tableName = SqlUtil.getTableName(o);
         String ret = TABLE_NAME_CACHE.get(tableName);
         if (ret != null) {
             return ret;
@@ -292,8 +292,8 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
     @Override
     public <ROW> List<ROW> select(Class<ROW> returnType, Object... args) {
         Map<String, Object> query = query(args);
-        if (!query.containsKey(DaoConstants.TABLE_NAME)) {
-            query.put(DaoConstants.TABLE_NAME, DaoUtil.getTableName(returnType));
+        if (!query.containsKey(SqlConstants.TABLE_NAME)) {
+            query.put(SqlConstants.TABLE_NAME, SqlUtil.getTableName(returnType));
         }
         return select(SIMPLE_WHERE, query, returnType);
     }
@@ -776,7 +776,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
         if (declaringClass == null) {
             return false;
         }
-        String table = DaoUtil.getTableName(declaringClass);
+        String table = SqlUtil.getTableName(declaringClass);
         return StringUtil.equalsIgnoreCase(tableName, table);
     }
 
@@ -794,7 +794,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
         if (declaringClass == null) {
             return false;
         }
-        String table = DaoUtil.getTableName(declaringClass);
+        String table = SqlUtil.getTableName(declaringClass);
         return StringUtil.equalsIgnoreCase(tableName, table);
     }
 
@@ -812,7 +812,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
         if (declaringClass == null) {
             return false;
         }
-        String table = DaoUtil.getTableName(declaringClass);
+        String table = SqlUtil.getTableName(declaringClass);
         return StringUtil.equalsIgnoreCase(tableName, table);
     }
 
@@ -1345,7 +1345,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
                 addWhereValues(e, whereColumnNames, tableMetaData, values);
             }
             if (isAllNull(values)) {
-                throw new DaoRuntimeException("00044");
+                throw new MissingPrimaryKeyValueException("00044");
             }
             prepareUpdate(tableMetaData.getTableName(), entity, locking);
             values.putAll(getUpdateParameterValues(entities, updateColumnNames, tableMetaData));
@@ -1423,7 +1423,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
     }
 
     protected String getColumnName(PropertyDesc propertyDesc) {
-        return DaoUtil.getColumnName(propertyDesc);
+        return SqlUtil.getColumnName(propertyDesc);
     }
 
     protected String createUpdateSql(String tableName, List<String> updateColumnNames, Map<String, ParameterValue> values,
@@ -1474,7 +1474,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
 
             addWhereValues(entity, whereColumnNames, tableMetaData, values);
             if (isAllNull(values)) {
-                throw new DaoRuntimeException("00044");
+                throw new MissingPrimaryKeyValueException("00044");
             }
             String sql = createDeleteSql(tableMetaData.getTableName(), whereColumnNames, values);
             Triple<Integer, Connection, PreparedStatement> triple = executeUpdate(values, sql);
@@ -2202,7 +2202,7 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
     }
 
     @Override
-    public DaoConfig getConfig() {
+    public SqlConfig getConfig() {
         return config;
     }
 

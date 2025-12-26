@@ -1,6 +1,7 @@
 package jp.dodododo.sql.exception;
 
-public class ArgNotFoundException extends DaoRuntimeException {
+// TODO change parent class
+public class ArgNotFoundException extends MissingPrimaryKeyValueException {
 	private static final long serialVersionUID = 1L;
 
 	protected String argName;

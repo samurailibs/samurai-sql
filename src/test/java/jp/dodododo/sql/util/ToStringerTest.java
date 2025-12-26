@@ -1,6 +1,6 @@
 package jp.dodododo.sql.util;
 
-import static jp.dodododo.sql.util.DaoUtil.*;
+import static jp.dodododo.sql.util.SqlUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;

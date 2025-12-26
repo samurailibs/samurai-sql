@@ -1,7 +1,7 @@
 package jp.dodododo.sql.util;
 
 import static jp.dodododo.sql.sql.orderby.SortType.*;
-import static jp.dodododo.sql.util.DaoUtil.*;
+import static jp.dodododo.sql.util.SqlUtil.*;
 
 import java.util.List;
 import java.util.Set;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DaoUtilTest {
+public class SqlUtilTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
