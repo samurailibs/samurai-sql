@@ -4,11 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import jp.dodododo.sql.annotation.Internal;
 import jp.dodododo.sql.exception.PropertyNotFoundRuntimeException;
@@ -63,11 +59,30 @@ public class ObjectDesc<OBJ> {
 		}
 		this.targetClass = targetClass;
 		this.classDesc = new ClassDesc<>(targetClass);
-		setupPropertyDescs();
-		setupAnnotationCache();
-		setupJavaTypeCache();
-		setupWritablePropertyDescs();
-		setupReadablePropertyDescs();
+		if (!targetClass.getName().startsWith("java.")) {
+			setupPropertyDescs();
+			setupAnnotationCache();
+			setupJavaTypeCache();
+			setupWritablePropertyDescs();
+			setupReadablePropertyDescs();
+		}
+	}
+
+	protected Set<Field> toSet(Field[] declaredFields) {
+		Set<Field> set = new HashSet<>();
+		if (declaredFields == null) {
+			return set;
+		}
+		Collections.addAll(set, declaredFields);
+		return set;
+	}
+	protected Set<Method> toSet(Method[] declaredMethods) {
+		Set<Method> set = new HashSet<>();
+		if (declaredMethods == null) {
+			return set;
+		}
+		Collections.addAll(set, declaredMethods);
+		return set;
 	}
 
 	protected void setupReadablePropertyDescs() {

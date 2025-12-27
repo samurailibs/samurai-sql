@@ -58,6 +58,7 @@ public class ProxyPropertyTest {
 
 		assertEquals(sql, logRegistry.getLast().getCompleteSql());
 		assertEquals("10", select.get(0).dept.getDEPTNO());
+		assertEquals("ACCOUNTING", select.get(0).dept.getDNAME());
 		assertEqualsIgnoreCase("select * from dept where deptno = 10", logRegistry.getLast().getCompleteSql());
 	}
 
@@ -118,12 +119,12 @@ public class ProxyPropertyTest {
 
 		@Override
 		public String getDEPTNO() {
-			return real().getDEPTNO();
+			return DEPTNO;
 		}
 
 		@Override
 		public void setDEPTNO(String deptno) {
-			real().setDEPTNO(deptno);
+			this.DEPTNO = deptno;
 		}
 
 		@Override

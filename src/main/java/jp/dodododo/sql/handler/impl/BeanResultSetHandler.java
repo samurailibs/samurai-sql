@@ -10,22 +10,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import jp.dodododo.sql.ConnectionHolder;
 import jp.dodododo.sql.IterationCallback;
-import jp.dodododo.sql.annotation.Arg;
-import jp.dodododo.sql.annotation.Bean;
-import jp.dodododo.sql.annotation.Column;
-import jp.dodododo.sql.annotation.Compress;
-import jp.dodododo.sql.annotation.Zone;
+import jp.dodododo.sql.annotation.*;
 import jp.dodododo.sql.columns.ResultSetColumn;
 import jp.dodododo.sql.commons.Null;
 import jp.dodododo.sql.exception.InstantiationRuntimeException;
@@ -68,6 +57,15 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 
 	private static final Map<Class<?>, Constructor<?>> USABLE_CONSTRUCTORS = CacheUtil.cacheMap();
 
+	static {
+        try {
+			USABLE_CONSTRUCTORS.put(List.class, ArrayList.class.getConstructor());
+			USABLE_CONSTRUCTORS.put(Set.class, HashSet.class.getConstructor());
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 	private Class<T> beanClass;
 
 	private String createMethod;
@@ -102,6 +100,9 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 
 	protected void validateBeanClass(Class<?> clazz) {
 		int modifiers = clazz.getModifiers();
+		if (Collection.class.isAssignableFrom(clazz)) {
+			return;
+		}
 		if (Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)) {
 			throw new InstantiationRuntimeException(clazz);
 		}
@@ -164,6 +165,15 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 	}
 
 	private boolean isForRelProperty(PropertyDesc propertyDesc) {
+		if(propertyDesc.isCollectionType()) {
+			Type elementType = getElementType(propertyDesc);
+			if(elementType instanceof Class c) {
+				JavaType<?> javaType = TypesUtil.getJavaType(c);
+				if (JavaTypes.OBJECT == javaType) {
+					return true;
+				}
+			}
+		}
 		if (propertyDesc.isWritable() == false) {
 			return false;
 		}
@@ -191,6 +201,10 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		}
 
 		Class<?> propertyType = propertyDesc.getPropertyType();
+		Class<?> declaringClass = propertyDesc.getDeclaringClass();
+		if (declaringClass.getName().startsWith("java.")) {
+			return;
+		}
 		boolean isOneDimensionalArray = propertyDesc.isOneDimensionalArrayType();
 		if (propertyDesc.isCollectionType() == true || isOneDimensionalArray == true) { // OneToMany,ManyToMany
 			Type elementType = getElementType(propertyDesc);
@@ -587,7 +601,9 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		}
 
 		BEAN bean;
-		if (LazyLoadingUtil.isProxy(beanClass) == true) {
+		if (!isCreate(constructor, initArgs)) {
+			bean = null;
+		} else if (LazyLoadingUtil.isProxy(beanClass)) {
 			ProxyFactory proxyFactory = ProxyFactory.newInstance(beanClass);
 			bean = proxyFactory.create(beanClass, constructor, initArgs);
 		} else {
@@ -596,11 +612,33 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		for (int i = 0; i < initArgs.length; i++) {
 			addRowDataCaches(bean, constructor.getParameterTypes()[i], paramNames.get(i), initArgs[i]);
 		}
-		if (bean instanceof ConnectionHolder) {
-			ConnectionHolder holder = (ConnectionHolder) bean;
-			holder.setConnection(connection);
+		if (bean instanceof ConnectionHolder holder) {
+            holder.setConnection(connection);
 		}
 		return bean;
+	}
+
+	protected boolean isCreate(Constructor<?> constructor, Object[] initArgs) {
+		Class<?>[] pts = constructor.getParameterTypes();
+		Annotation[][] pas = constructor.getParameterAnnotations();
+		if (pts == null || pts.length == 0) {
+			return true;
+		} else {
+			for (int i = 0; i < pts.length; i++) {
+				Annotation[] as = pas[i];
+				for (Annotation a : as) {
+					if (a instanceof Bean b) {
+						if (b.nullable()) {
+							return true;
+						}
+					}
+				}
+				if (initArgs[i] != null) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	protected <BEAN> void processDefault(Class<?> parameterType,Annotation[][] parameterAnnotations, List<Column> columnAnnotations,int i,Constructor<BEAN> constructor,List<ResultSetColumn> resultSetColumnList,Map<String, Object> args,Object[] initArgs,Object[] dbInitArgs,Map<Integer, String> paramNames,ResultSet rs) {

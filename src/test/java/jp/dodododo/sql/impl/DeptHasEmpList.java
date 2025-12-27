@@ -22,6 +22,11 @@ public class DeptHasEmpList {
 		return empList;
 	}
 
+	public DeptHasEmpList(String DEPTNO, List<Emp> empList) {
+		this.DEPTNO= DEPTNO;
+		this.empList= empList;
+	}
+
 	public void setEmpList(List<Emp> empList) {
 		this.empList = empList;
 	}

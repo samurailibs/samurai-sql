@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.config.SqlConfig;
@@ -94,7 +95,7 @@ public class Issue35Test {
 
 	@Test
 	public void testPrimitiveArgs() {
-		Dao dao = newTestClient(dbTestExtension.getConnection());
+		SamuraiSqlClient dao = newTestClient(dbTestExtension.getConnection());
 		List<PrimitiveArgsEmp> list = dao.select("select * from EMP where comm > 0", PrimitiveArgsEmp.class);
 		assertTrue(list.isEmpty() == false);
 		for (PrimitiveArgsEmp emp : list) {

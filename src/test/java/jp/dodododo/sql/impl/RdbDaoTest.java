@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.sql.DataSource;
 
 import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Columns;
 import jp.dodododo.sql.annotation.Dialects;
@@ -64,7 +65,7 @@ public class RdbDaoTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient dao;
 
 	@BeforeEach
 	public void createSequence() throws SQLException {
@@ -1211,7 +1212,7 @@ public class RdbDaoTest {
 
 	@Test
 	public void testDeleteFromTowPk() throws Exception {
-		Dao dao = newTestClient(getConnection());
+		dao = newTestClient(getConnection());
 		TwoPkTable twoPk = new TwoPkTable();
 		twoPk.PK1 = 1;
 		twoPk.PK2 = 2;
@@ -1286,6 +1287,29 @@ public class RdbDaoTest {
 				},
 				IllegalStateException::new);
 
+	}
+
+	@Test
+	public void testRecordDeptHasRecordEmpList() throws Exception {
+		dao = newTestClient(getConnection());
+
+		List<RecordDept> deptList = dao.select("SELECT * FROM dept JOIN emp ON dept.deptno = emp.deptno ORDER BY dept.deptno, emp.empno", RecordDept.class);
+		assertEquals(3, deptList.size());
+		assertEquals(3, deptList.get(0).empList().size());
+		assertEquals(5, deptList.get(1).empList().size());
+		assertEquals(6, deptList.get(2).empList().size());
+
+		RecordDept test = new RecordDept(new EntityId(), "test", new ArrayList<>());
+		dao.insert(test);
+
+		deptList = dao.select("SELECT * FROM dept LEFT JOIN emp ON dept.deptno = emp.deptno ORDER BY dept.deptno, emp.empno", RecordDept.class);
+		System.out.println(deptList);
+		assertEquals(5, deptList.size());
+		assertEquals(0, deptList.get(0).empList().size());
+		assertEquals(3, deptList.get(1).empList().size());
+		assertEquals(5, deptList.get(2).empList().size());
+		assertEquals(6, deptList.get(3).empList().size());
+		assertEquals(0, deptList.get(4).empList().size());
 	}
 
 	@Test
