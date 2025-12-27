@@ -74,11 +74,11 @@ public class CandidateValueTest {
 	@Test
 	public void test() throws Exception {
 		Sub child = new Sub();
-		Dao dao = new Dao(getConnection());
+		Client client = new Client(getConnection());
 		List<CandidateValue> values = new ArrayList<CandidateValue>();
 		StringBuilder path = new StringBuilder();
 		Map<Integer, Object> processedObjects = new HashMap<Integer, Object>();
-		dao.gatherValue(child, "aaa", "order_date", values, path, processedObjects);
+		client.gatherValue(child, "aaa", "order_date", values, path, processedObjects);
 
 		Object value = CandidateValue.getValue(values, null, null).value.getValue();
 		assertTrue( value instanceof Date);
@@ -87,7 +87,7 @@ public class CandidateValueTest {
 		values = new ArrayList<CandidateValue>();
 		path = new StringBuilder();
 		processedObjects = new HashMap<Integer, Object>();
-		dao.gatherValue(child, "aaa", "order_date", values, path, processedObjects);
+		client.gatherValue(child, "aaa", "order_date", values, path, processedObjects);
 		value = CandidateValue.getValue(values, null, null).value.getValue();
 		assertNull(value);
 	}
@@ -96,15 +96,15 @@ public class CandidateValueTest {
 		return dbTestExtension.getConnection();
 	}
 
-	public static class Dao extends RdbDao {
+	public static class Client extends RdbDao {
 
 
 
-		public Dao() {
+		public Client() {
 			super();
 		}
 
-		public Dao(Connection connection) {
+		public Client(Connection connection) {
 			super(connection);
 		}
 

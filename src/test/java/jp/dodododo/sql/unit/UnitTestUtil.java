@@ -10,9 +10,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
 import jp.dodododo.sql.SamuraiSqlClient;
-import jp.dodododo.sql.impl.RdbDao;
 import jp.dodododo.sql.impl.SamuraiSqlClientImpl;
 import jp.dodododo.sql.object.PropertyDesc;
 import org.slf4j.Logger;
@@ -20,20 +18,20 @@ import org.slf4j.LoggerFactory;
 
 public class UnitTestUtil {
 
-	public static Dao newTestClient() {
-		Class<?>[] interfaces = new Class[] { Dao.class };
-		InvocationHandler handler = new Handler(new RdbDao());
+	public static SamuraiSqlClient newTestClient() {
+		Class<?>[] interfaces = new Class[] { SamuraiSqlClient.class };
+		InvocationHandler handler = new Handler(new SamuraiSqlClientImpl());
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		Dao dao = (Dao) Proxy.newProxyInstance(loader, interfaces, handler);
-		return dao;
+		SamuraiSqlClient client = (SamuraiSqlClient) Proxy.newProxyInstance(loader, interfaces, handler);
+		return client;
 	}
 
-	public static Dao newTestClient(DataSource dataSource) {
-		Class<?>[] interfaces = new Class[] { Dao.class };
-		InvocationHandler handler = new Handler(new RdbDao(dataSource));
+	public static SamuraiSqlClient newTestClient(DataSource dataSource) {
+		Class<?>[] interfaces = new Class[] { SamuraiSqlClient.class };
+		InvocationHandler handler = new Handler(new SamuraiSqlClientImpl(dataSource));
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		Dao dao = (Dao) Proxy.newProxyInstance(loader, interfaces, handler);
-		return dao;
+		SamuraiSqlClient client = (SamuraiSqlClient) Proxy.newProxyInstance(loader, interfaces, handler);
+		return client;
 	}
 
 	public static SamuraiSqlClient newTestClient(Connection connection) {

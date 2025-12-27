@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Date;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
 import jp.dodododo.sql.annotation.IdDefSet;
@@ -28,24 +28,24 @@ public class SelectRowTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(dbTestExtension.getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(dbTestExtension.getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 		Emp emp = new Emp();
 		emp.COMM = "2";
 		// emp.EMPNO = "1";
 		emp.TSTAMP = null;
 		emp.TSTAMP = new Date();
 		emp.NAME = "ename";
-		int count = dao.insert("EMP", emp);
+		int count = client.insert("EMP", emp);
 		assertEquals(1, count);
 		Integer empNo = Integer.parseInt(emp.EMPNO);
 
-		List<Row> select = dao.select("SELECT * FROM EMP WHERE empno = " + empNo, Row.class);
+		List<Row> select = client.select("SELECT * FROM EMP WHERE empno = " + empNo, Row.class);
 		assertEqualsIgnoreCase("SELECT * FROM emp WHERE empno = "+ empNo, logRegistry.getLast().getCompleteSql());
 		assertEquals(empNo, select.get(0).getInteger("EMPNO"));
 		assertEquals("" + empNo, select.get(0).getString("EMPNO"));
@@ -53,7 +53,7 @@ public class SelectRowTest {
 		assertEquals("ename", select.get(0).getString("ENAME"));
 		assertNotNull(select.get(0).getString("TSTAMP"));
 
-		select = dao.select(SIMPLE_WHERE, args(TABLE_NAME, "EMP", "EMPNO", empNo), Row.class);
+		select = client.select(SIMPLE_WHERE, args(TABLE_NAME, "EMP", "EMPNO", empNo), Row.class);
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO = "+ empNo, logRegistry.getLast().getCompleteSql());
 		assertEquals(empNo, select.get(0).getInteger("EMPNO"));
 		assertEquals("" + empNo, select.get(0).getString("EMPNO"));

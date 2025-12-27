@@ -4,7 +4,7 @@ import static jp.dodododo.sql.unit.UnitTestUtil.*;
 import static jp.dodododo.sql.util.SqlUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.types.TypeConverter;
 import jp.dodododo.sql.unit.DbTestExtension;
 
@@ -16,26 +16,26 @@ public class InsertObjectAndMap {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
-		assertFalse(dao.exists(new Emp(1)));
-		assertFalse(dao.exists(new Emp(2)));
-		assertFalse(dao.exists("emp", new Emp(1), args("ename", "nnn", "job", "jjj")));
-		int count = dao.insert("emp", new Emp(1), args("ename", "nnn", "job", "jjj"));
+		assertFalse(client.exists(new Emp(1)));
+		assertFalse(client.exists(new Emp(2)));
+		assertFalse(client.exists("emp", new Emp(1), args("ename", "nnn", "job", "jjj")));
+		int count = client.insert("emp", new Emp(1), args("ename", "nnn", "job", "jjj"));
 		assertEquals(1, count);
-		assertFalse(dao.exists(new Emp(2)));
-		assertTrue(dao.exists(new Emp(1)));
-		assertTrue(dao.exists("emp", args("ename", "nnn", "job", "jjj"), new Emp(1)));
-		count = dao.insert("emp", new Emp(2), args("ename", "nnn", "job", "jjj"));
+		assertFalse(client.exists(new Emp(2)));
+		assertTrue(client.exists(new Emp(1)));
+		assertTrue(client.exists("emp", args("ename", "nnn", "job", "jjj"), new Emp(1)));
+		count = client.insert("emp", new Emp(2), args("ename", "nnn", "job", "jjj"));
 		assertEquals(1, count);
-		assertTrue(dao.exists(new Emp(1)));
-		assertTrue(dao.exists(new Emp(2)));
+		assertTrue(client.exists(new Emp(1)));
+		assertTrue(client.exists(new Emp(2)));
 
-		TypeConverter result = new TypeConverter(dao.selectOneMap("select * from EMP where empno = 1"));
+		TypeConverter result = new TypeConverter(client.selectOneMap("select * from EMP where empno = 1"));
 		assertEquals(1, result.getInteger("empno").intValue());
 		assertEquals("nnn", result.getString("ename"));
 		assertEquals("jjj", result.getString("job"));

@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.script.Each;
 import jp.dodododo.sql.unit.DbTestExtension;
 
@@ -23,14 +23,14 @@ public class Issue46Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void test1() throws Exception {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		final AtomicBoolean invoked = new AtomicBoolean(false);
-		dao.selectMap("select * from EMP", by("empno", 1), new Each() {
+		client.selectMap("select * from EMP", by("empno", 1), new Each() {
 			@SuppressWarnings("unused")
 			public void each(Map<String, Object> row) {
 				invoked.getAndSet(true);
@@ -41,10 +41,10 @@ public class Issue46Test {
 
 	@Test
 	public void test2() throws Exception {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		final AtomicBoolean invoked = new AtomicBoolean(false);
-		dao.selectMap(ALL, from("emp"), new Each() {
+		client.selectMap(ALL, from("emp"), new Each() {
 			@SuppressWarnings("unused")
 			public void each(Map<String, Object> row) {
 				invoked.getAndSet(true);
@@ -55,10 +55,10 @@ public class Issue46Test {
 
 	@Test
 	public void test3() throws Exception {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		final AtomicBoolean invoked = new AtomicBoolean(false);
-		dao.selectMap("select * from EMP", new Each() {
+		client.selectMap("select * from EMP", new Each() {
 			@SuppressWarnings("unused")
 			public void each(Map<String, Object> row) {
 				invoked.getAndSet(true);
@@ -69,10 +69,10 @@ public class Issue46Test {
 
 	@Test
 	public void test4() throws Exception {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		final AtomicBoolean invoked = new AtomicBoolean(false);
-		dao.selectMap(from("emp"), where("empno", ge("100")), new Each() {
+		client.selectMap(from("emp"), where("empno", ge("100")), new Each() {
 			@SuppressWarnings("unused")
 			public void each(Map<String, Object> row) {
 				invoked.getAndSet(true);

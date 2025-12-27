@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
@@ -29,13 +29,13 @@ public class SelectAllTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testSelectAll() {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
-		List<Emp> allEmp = dao.select(ALL, Emp.class);
+		List<Emp> allEmp = client.select(ALL, Emp.class);
 		assertEquals(14, allEmp.size());
 		Emp emp = allEmp.get(0);
 		assertEquals("7369", emp.EMPNO);

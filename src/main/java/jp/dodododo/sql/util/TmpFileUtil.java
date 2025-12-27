@@ -18,7 +18,7 @@ public class TmpFileUtil {
 	public static File createTempFile() {
 		try {
 			Set<File> tmpSet = tmpFiles.get();
-			File tmpFile = File.createTempFile("samurai-dao-", ".tmp");
+			File tmpFile = File.createTempFile("samurai-sql-", ".tmp");
 			tmpSet.add(tmpFile);
 			tmpFile.deleteOnExit();
 			return tmpFile;

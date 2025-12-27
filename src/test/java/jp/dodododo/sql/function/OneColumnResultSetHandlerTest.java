@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
 import jp.dodododo.sql.annotation.IdDefSet;
@@ -23,29 +23,29 @@ public class OneColumnResultSetHandlerTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
-		List<String> resultStringList = dao.select("SELECT ename FROM EMP ORDER BY empno", String.class);
+		List<String> resultStringList = client.select("SELECT ename FROM EMP ORDER BY empno", String.class);
 		assertEquals("SMITH", resultStringList.get(0));
 
-		List<Integer> resultIntegerList = dao.select("SELECT sal FROM EMP ORDER BY empno", Integer.class);
+		List<Integer> resultIntegerList = client.select("SELECT sal FROM EMP ORDER BY empno", Integer.class);
 		assertEquals(800, (int) resultIntegerList.get(0));
 
-		List<Integer> resultBigDecimalList = dao.select("SELECT sal FROM EMP ORDER BY empno", Integer.class);
+		List<Integer> resultBigDecimalList = client.select("SELECT sal FROM EMP ORDER BY empno", Integer.class);
 		assertEquals(Integer.valueOf("800"), resultBigDecimalList.get(0));
 
 		@SuppressWarnings("rawtypes")
-		List<Map> resultMapList = dao.select("SELECT * FROM EMP ORDER BY empno", Map.class);
+		List<Map> resultMapList = client.select("SELECT * FROM EMP ORDER BY empno", Map.class);
 		assertEquals(7369, ((Number) resultMapList.get(0).get("empno")).intValue());
 		assertEquals("SMITH", resultMapList.get(0).get("ename"));
 		assertEquals(800, ((Number) resultMapList.get(0).get("sal")).intValue());
 
 		try {
-			dao.select("SELECT sal FROM emp ORDER BY empno", Class.class);
+			client.select("SELECT sal FROM emp ORDER BY empno", Class.class);
 			fail();
 		} catch (UnsupportedTypeException success) {
 			System.out.println(success.getMessage());

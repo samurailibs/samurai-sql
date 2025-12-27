@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.unit.DbTestExtension;
@@ -21,7 +21,7 @@ public class Issue38Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -30,9 +30,9 @@ public class Issue38Test {
 
 	@Test
 	public void test() throws ParseException {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
-		List<Dept> deptList = dao.select(
+		List<Dept> deptList = client.select(
 				"select DEPT.deptno, DEPT.dname, EMP.empno, EMP.ename from DEPT , EMP where EMP.deptno = DEPT.deptno order by DEPT.deptno", Dept.class);
 
 		assertEquals(3, deptList.size());

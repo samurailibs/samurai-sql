@@ -3,7 +3,7 @@ package jp.dodododo.sql.issue;
 import static jp.dodododo.sql.unit.UnitTestUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.unit.DbTestExtension;
 
@@ -15,13 +15,13 @@ public class Issue7Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void test() {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 		Emp emp = new Emp();
-		int count = dao.insert(emp);
+		int count = client.insert(emp);
 		assertEquals(1, count);
 	}
 

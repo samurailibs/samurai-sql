@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Table;
 import jp.dodododo.sql.annotation.Zone;
@@ -42,14 +42,12 @@ public class TimeTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
-
 	static final long defaultOffsetHour;
 	static final long defaultOffsetMinutes;
 
 	static {
 		String defaultOffset = new SimpleDateFormat("ZZZ").format(new Date());
-		int offset = Integer.valueOf(defaultOffset);
+		int offset = Integer.parseInt(defaultOffset);
 		defaultOffsetHour = (offset / 100);
 		defaultOffsetMinutes = (offset % 100);
 
@@ -57,10 +55,10 @@ public class TimeTest {
 
 	@Test
 	public void testSelect() {
-		dao = newTestClient(getDataSource());
+		SamuraiSqlClient client = newTestClient(getDataSource());
 
-		List<TimeBean1> list1 = dao.select(ALL, TimeBean1.class);
-		list1.stream().forEach(bean -> {
+		List<TimeBean1> list1 = client.select(ALL, TimeBean1.class);
+		list1.forEach(bean -> {
 			String date = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(bean.date);
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
@@ -103,8 +101,8 @@ public class TimeTest {
 			assertEquals(date, zdt2.format(formatter));
 		});
 
-		List<TimeBean2> list2 = dao.select(ALL, TimeBean2.class);
-		list2.stream().forEach(bean -> {
+		List<TimeBean2> list2 = client.select(ALL, TimeBean2.class);
+		list2.forEach(bean -> {
 			String yyyyMMdd = new SimpleDateFormat("yyyy/MM/dd").format(bean.date);
 			String yyyyMM = new SimpleDateFormat("yyyy/MM").format(bean.date);
 			String MMdd = new SimpleDateFormat("MM/dd").format(bean.date);

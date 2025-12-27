@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.text.ParseException;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.exception.MissingPrimaryKeyValueException;
 import jp.dodododo.sql.unit.DbTestExtension;
@@ -20,7 +20,7 @@ public class Issue15Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -29,17 +29,17 @@ public class Issue15Test {
 
 	@Test
 	public void test() throws ParseException {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
 		try {
-			dao.update("EMP", map("ename", "mike"));
+			client.update("EMP", map("ename", "mike"));
 			fail();
 		} catch (MissingPrimaryKeyValueException success) {
 			assertEquals("00044", success.getMessageCode());
 		}
 
 		try {
-			dao.delete("EMP", map("ename", "mike"));
+			client.delete("EMP", map("ename", "mike"));
 			fail();
 		} catch (MissingPrimaryKeyValueException success) {
 			assertEquals("00044", success.getMessageCode());

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
@@ -28,11 +28,11 @@ public class CreateMethodConstructorTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
 		Emp emp = new Emp();
 		emp.dept = new Dept();
@@ -43,11 +43,11 @@ public class CreateMethodConstructorTest {
 		emp.TSTAMP = null;
 		emp.TSTAMP = new Date();
 		emp.NAME = "ename";
-		dao.insert("EMP", emp);
-		// dao.insert(emp.dept);
+		client.insert("EMP", emp);
+		// client.insert(emp.dept);
 		String empNo = emp.EMPNO;
 
-		List<Emp> select = dao.select("select DEPT.deptno as DEPTNO from EMP, DEPT where EMP.deptno = DEPT.deptno and empno = " + empNo, Emp.class);
+		List<Emp> select = client.select("select DEPT.deptno as DEPTNO from EMP, DEPT where EMP.deptno = DEPT.deptno and empno = " + empNo, Emp.class);
 
 		assertTrue(select.get(0).dept instanceof Dept2);
 		assertEquals("10", select.get(0).dept.getDEPTNO());

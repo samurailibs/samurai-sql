@@ -9,7 +9,7 @@ import java.util.Date;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Id;
 import jp.dodododo.sql.annotation.IdDefSet;
 import jp.dodododo.sql.annotation.Timestamp;
@@ -17,7 +17,6 @@ import jp.dodododo.sql.annotation.VersionNo;
 import jp.dodododo.sql.dialect.Dialect;
 import jp.dodododo.sql.dialect.DialectManager;
 import jp.dodododo.sql.dialect.sqlite.SQLite;
-import jp.dodododo.sql.id.Identity;
 import jp.dodododo.sql.id.Sequence;
 import jp.dodododo.sql.unit.DbTestExtension;
 
@@ -30,7 +29,7 @@ public class Issue42Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void test() throws Exception {
@@ -39,7 +38,7 @@ public class Issue42Test {
 			return;
 		}
 
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		Emp emp = new Emp();
 
@@ -49,7 +48,7 @@ public class Issue42Test {
 
 		Date start = new Date();
 		Thread.sleep(10);
-		dao.insert(emp);
+		client.insert(emp);
 		Thread.sleep(10);
 		Date end = new Date();
 
@@ -57,7 +56,7 @@ public class Issue42Test {
 		assertNotNull(emp.tstamp);
 		assertNotNull(emp.comm);
 
-		emp = dao.selectOne(Emp.class, from("emp"), by("empno", emp.empno)).get();
+		emp = client.selectOne(Emp.class, from("emp"), by("empno", emp.empno)).get();
 		assertNotNull(emp.empno);
 		assertTrue(
 				start.getTime() <= emp.tstamp.getTime() && emp.tstamp.getTime() <= end.getTime(),

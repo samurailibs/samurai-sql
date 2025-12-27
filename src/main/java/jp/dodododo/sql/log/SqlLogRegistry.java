@@ -33,18 +33,10 @@ public class SqlLogRegistry {
 		return INSTANCE;
 	}
 
-	/**
-	 * デフォルトの上限サイズを使用してインスタンスを構築します。
-	 */
 	public SqlLogRegistry() {
 		this(SqlConfig.getDefaultConfig());
 	}
 
-	/**
-	 * DaoConfigを指定してインスタンスを構築します。
-	 *
-	 * @param config config
-	 */
 	public SqlLogRegistry(SqlConfig config) {
 		setConfig(config);
 	}
@@ -131,7 +123,7 @@ public class SqlLogRegistry {
 	public File dump() {
 		File dumpFile;
 		try {
-			dumpFile = File.createTempFile("samurai-dao-sql-", ".dump", null);
+			dumpFile = File.createTempFile("samurai-sql-", ".dump", null);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			return null;

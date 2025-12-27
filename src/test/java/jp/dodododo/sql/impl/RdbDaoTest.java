@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
 import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Columns;
@@ -65,7 +64,7 @@ public class RdbDaoTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private SamuraiSqlClient dao;
+	private SamuraiSqlClient client;
 
 	@BeforeEach
 	public void createSequence() throws SQLException {
@@ -78,17 +77,17 @@ public class RdbDaoTest {
 
 	@Test
 	public void testInsertENTITY() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 		Emp emp = new Emp();
 		emp.setCOMM("2");
 		emp.setDEPTNO("10");
 		emp.setEMPNO("1");
 		emp.setENAME("ename");
-		int count = dao.insert(emp);
+		int count = client.insert(emp);
 		assertEquals(1, count);
 
 		try {
-			dao.insert(emp);
+			client.insert(emp);
 			fail();
 		} catch (SQLRuntimeException success) {
 		}
@@ -96,26 +95,26 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectClassMaps() {
-		dao = newTestClient(getDataSource());
-		List<Row> list = dao.select(Row.class, from("EMP"), where("JOB", "CLERK"), orderBy("ENAME", DESC));
+		client = newTestClient(getDataSource());
+		List<Row> list = client.select(Row.class, from("EMP"), where("JOB", "CLERK"), orderBy("ENAME", DESC));
 		assertEquals(4, list.size());
-		String sql = dao.getSqlLogRegistry().getLast().getCompleteSql();
+		String sql = client.getSqlLogRegistry().getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE JOB = 'CLERK' ORDER BY ENAME DESC", sql);
 		assertEquals("SMITH", list.get(0).getString("ename"));
 		assertEquals("MILLER", list.get(1).getString("ename"));
 		assertEquals("JAMES", list.get(2).getString("ename"));
 		assertEquals("ADAMS", list.get(3).getString("ename"));
 
-		List<Emp> empList = dao.select(Emp.class, from("EMP"), where("JOB", "CLERK"), orderBy("EMPNO"));
+		List<Emp> empList = client.select(Emp.class, from("EMP"), where("JOB", "CLERK"), orderBy("EMPNO"));
 		assertEquals(4, empList.size());
-		sql = dao.getSqlLogRegistry().getLast().getCompleteSql();
+		sql = client.getSqlLogRegistry().getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE JOB = 'CLERK' ORDER BY EMPNO", sql);
 	}
 
 	@Test
 	public void testSelectEntityNotDefaultConstructor() {
-		dao = newTestClient(getDataSource());
-		List<EmpHasNotDefaultConstructor> list = dao.select("select * from EMP order by EMPNO desc", EmpHasNotDefaultConstructor.class);
+		client = newTestClient(getDataSource());
+		List<EmpHasNotDefaultConstructor> list = client.select("select * from EMP order by EMPNO desc", EmpHasNotDefaultConstructor.class);
 
 		EmpHasNotDefaultConstructor emp = list.get(0);
 		assertEquals("7934", emp.getEMPNO());
@@ -125,8 +124,8 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectEntityConstructorHasBean() {
-		dao = newTestClient(getDataSource());
-		List<EmpConstructorHasDept> list = dao
+		client = newTestClient(getDataSource());
+		List<EmpConstructorHasDept> list = client
 				.select("select EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, EMP.TSTAMP, DEPT.DEPTNO, DNAME from EMP, DEPT where EMP.DEPTNO = DEPT.DEPTNO order by EMPNO desc, DEPT.DEPTNO desc",
 						EmpConstructorHasDept.class);
 
@@ -144,8 +143,8 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectEntityConstructorHasBeanAnnotatedDept() {
-		dao = newTestClient(getDataSource());
-		List<EmpConstructorHasBeanAnnotatedDept> list = dao
+		client = newTestClient(getDataSource());
+		List<EmpConstructorHasBeanAnnotatedDept> list = client
 				.select("select EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, EMP.TSTAMP, DEPT.DEPTNO, DNAME from EMP, DEPT where EMP.DEPTNO = DEPT.DEPTNO order by EMPNO desc, DEPT.DEPTNO desc",
 						EmpConstructorHasBeanAnnotatedDept.class);
 
@@ -165,8 +164,8 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectEntityEmpHasWritableField() {
-		dao = newTestClient(getDataSource());
-		List<EmpHasWritableField> list = dao.select("select * from EMP order by EMPNO desc", EmpHasWritableField.class);
+		client = newTestClient(getDataSource());
+		List<EmpHasWritableField> list = client.select("select * from EMP order by EMPNO desc", EmpHasWritableField.class);
 
 		EmpHasWritableField emp = list.get(0);
 		assertEquals("7934", emp.getEMPNO());
@@ -176,8 +175,8 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectEntityEmpHasAlias() {
-		dao = newTestClient(getDataSource());
-		List<EmpHasAlias> list = dao.select("select * from EMP order by EMPNO desc", EmpHasAlias.class);
+		client = newTestClient(getDataSource());
+		List<EmpHasAlias> list = client.select("select * from EMP order by EMPNO desc", EmpHasAlias.class);
 
 		EmpHasAlias emp = list.get(0);
 		assertEquals("7934", emp.NO);
@@ -187,15 +186,15 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectIn() {
-		dao = newTestClient(getDataSource());
-		List<Emp> list = dao.select("SELECT * FROM EMP WHERE empno IN /*IN empNoList*/(1, 2)/*END*/ order by empno",
+		client = newTestClient(getDataSource());
+		List<Emp> list = client.select("SELECT * FROM EMP WHERE empno IN /*IN empNoList*/(1, 2)/*END*/ order by empno",
 				args("empNoList", list(7369, 7499)), Emp.class);
 
 		assertEquals(2, list.size());
 		assertEquals("7369", list.get(0).getEMPNO());
 		assertEquals("7499", list.get(1).getEMPNO());
 
-		list = dao.select("SELECT * FROM EMP WHERE empno NOT IN /*IN empNoList*/(1, 2)/*END*/ order by empno", args("empNoList", list(7369, 7499)),
+		list = client.select("SELECT * FROM EMP WHERE empno NOT IN /*IN empNoList*/(1, 2)/*END*/ order by empno", args("empNoList", list(7369, 7499)),
 				Emp.class);
 
 		assertEquals(12, list.size());
@@ -206,8 +205,8 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectSql() {
-		dao = newTestClient(getDataSource());
-		List<Emp> list = dao.select(SIMPLE_WHERE, args(TABLE_NAME, "emp", "EMPNO", 7934), Emp.class);
+		client = newTestClient(getDataSource());
+		List<Emp> list = client.select(SIMPLE_WHERE, args(TABLE_NAME, "emp", "EMPNO", 7934), Emp.class);
 
 		assertEquals(1, list.size());
 		Emp emp = list.get(0);
@@ -221,14 +220,14 @@ public class RdbDaoTest {
 		if (dialect instanceof SQLite) {
 			return;
 		}
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 		BinaryTable binaryTable = new BinaryTable();
 		InputStream binary = getClass().getClassLoader().getResourceAsStream("jp/dodododo/sql/dialect.properties");
 		binaryTable.setBinary(binary);
-		int count = dao.insert(binaryTable);
+		int count = client.insert(binaryTable);
 		assertEquals(1, count);
 
-		binaryTable = dao.selectOne("select * from BINARY_TABLE where id=/*id*/0", args("id", binaryTable.getId()), BinaryTable.class).get();
+		binaryTable = client.selectOne("select * from BINARY_TABLE where id=/*id*/0", args("id", binaryTable.getId()), BinaryTable.class).get();
 		String expected = ReaderUtil.readText(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(
 				"jp/dodododo/sql/dialect.properties"), "UTF-8"));
 		assertEquals(expected, ReaderUtil.readText(new InputStreamReader(binaryTable.getBinary(), "UTF-8")));
@@ -236,14 +235,14 @@ public class RdbDaoTest {
 
 	@Test
 	public void testInsertENTITYHasIdAnnotation() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 		EmpHasIdAnnotation emp = new EmpHasIdAnnotation();
 		emp.setCOMM("2");
 		emp.setDEPTNO("10");
 		emp.setENAME("ename");
-		int count = dao.insert(emp);
+		int count = client.insert(emp);
 		assertEquals(1, count);
-		String completeSql = dao.getSqlLogRegistry().getLast().getCompleteSql();
+		String completeSql = client.getSqlLogRegistry().getLast().getCompleteSql();
 		assertMatches(
 				"INSERT INTO .* \\( EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO, TSTAMP \\) VALUES \\( .* , 'ename' , NULL , NULL , NULL , NULL , 2 , 10 , NULL \\)",
 				completeSql);
@@ -252,9 +251,9 @@ public class RdbDaoTest {
 		emp.setCOMM("2");
 		emp.setDEPTNO("10");
 		emp.setENAME("ename");
-		count = dao.insert(emp);
+		count = client.insert(emp);
 		assertEquals(1, count);
-		completeSql = dao.getSqlLogRegistry().getLast().getCompleteSql();
+		completeSql = client.getSqlLogRegistry().getLast().getCompleteSql();
 		assertMatches(
 				"INSERT INTO .* \\( EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO, TSTAMP \\) VALUES \\( .* , 'ename' , NULL , NULL , NULL , NULL , 2 , 10 , NULL \\)",
 				completeSql);
@@ -262,60 +261,60 @@ public class RdbDaoTest {
 
 	@Test
 	public void testDeleteENTITY() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 		Emp emp = new Emp();
 		emp.setCOMM("2");
 		emp.setDEPTNO("10");
 		emp.setEMPNO("1");
 		emp.setENAME("ename");
-		int count = dao.delete(emp);
+		int count = client.delete(emp);
 		assertEquals(0, count);
 
-		count = dao.insert(emp);
+		count = client.insert(emp);
 		assertEquals(1, count);
-		count = dao.delete(emp);
+		count = client.delete(emp);
 		assertEquals(1, count);
 	}
 
 	@Test
 	public void testUpdateENTITY() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 		Emp emp = new Emp();
 		emp.setCOMM("2");
 		emp.setDEPTNO("10");
 		emp.setEMPNO("1");
 		emp.setENAME("ename");
-		int count = dao.update(emp);
+		int count = client.update(emp);
 		assertEquals(0, count);
 
-		count = dao.insert(emp);
+		count = client.insert(emp);
 		assertEquals(1, count);
-		count = dao.update(emp);
+		count = client.update(emp);
 		assertEquals(1, count);
 	}
 
 	@Test
 	public void testUpdateENTITYHasVersionNo() throws Exception {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 		EmpHasVersionNoAnnotation emp = new EmpHasVersionNoAnnotation();
 		emp.setEMPNO("1");
 		emp.setDEPTNO("10");
 		emp.setENAME("ename");
-		int count = dao.insert(emp);
+		int count = client.insert(emp);
 		assertEquals(1, count);
 		assertTrue(StringUtil.equalsIgnoreCase("INSERT INTO EMP ( EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO, TSTAMP ) VALUES ( 1 , 'ename' , NULL , NULL , NULL , NULL , 1 , 10 , NULL )", logRegistry.getLast().getCompleteSql()));
 
 		TableMetaData tableMetaData = new TableMetaData(getDataSource().getConnection(), "emp");
 		String empnoColumnName = tableMetaData.getColumnMetaData("empno").getColumnName();
 		String commColumnName = tableMetaData.getColumnMetaData("COMM").getColumnName();
-		count = dao.update(emp);
+		count = client.update(emp);
 		assertEquals(1, count);
 		assertEqualsIgnoreCase(
 				"UPDATE EMP SET EMPNO = 1 , ENAME = 'ename' , JOB = NULL , MGR = NULL , HIREDATE = NULL , SAL = NULL , COMM = 2 , DEPTNO = 10 , TSTAMP = NULL WHERE "
 						+ empnoColumnName + " = 1 AND " + commColumnName + " = 1",
-				dao.getSqlLogRegistry().getLast().getCompleteSql());
-		count = dao.update(emp);
+				client.getSqlLogRegistry().getLast().getCompleteSql());
+		count = client.update(emp);
 		assertEquals(1, count);
 		assertEqualsIgnoreCase(
 				"UPDATE EMP SET EMPNO = 1 , ENAME = 'ename' , JOB = NULL , MGR = NULL , HIREDATE = NULL , SAL = NULL , COMM = 3 , DEPTNO = 10 , TSTAMP = NULL WHERE "
@@ -327,7 +326,7 @@ public class RdbDaoTest {
 
 	@Test
 	public void testInsertCollectionOfENTITY() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		List<Emp> entityList = new ArrayList<Emp>();
 		Emp emp1 = new Emp();
@@ -344,20 +343,20 @@ public class RdbDaoTest {
 		emp2.setENAME("ename");
 		entityList.add(emp2);
 
-		int[] counts = dao.insert(entityList);
+		int[] counts = client.insert(entityList);
 		assertEquals(1, counts[0]);
 		assertEquals(1, counts[1]);
 
-		int count = dao.update(emp1);
+		int count = client.update(emp1);
 		assertEquals(1, count);
 
-		count = dao.update(emp2);
+		count = client.update(emp2);
 		assertEquals(1, count);
 	}
 
 	@Test
 	public void testUpdateCollectionOfENTITY() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		List<Emp> entityList = new ArrayList<Emp>();
 		Emp emp1 = new Emp();
@@ -374,9 +373,9 @@ public class RdbDaoTest {
 		emp2.setENAME("ename");
 		entityList.add(emp2);
 
-		int[] counts = dao.insert(entityList);
+		int[] counts = client.insert(entityList);
 
-		counts = dao.update(entityList);
+		counts = client.update(entityList);
 		assertEquals(1, counts[0]);
 		assertEquals(1, counts[1]);
 		assertEquals(2, counts.length);
@@ -384,7 +383,7 @@ public class RdbDaoTest {
 
 	@Test
 	public void testUpdateCollectionOfENTITYHasVersionNo() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		List<EmpHasVersionNoAnnotation> entityList = new ArrayList<EmpHasVersionNoAnnotation>();
 		EmpHasVersionNoAnnotation emp1 = new EmpHasVersionNoAnnotation();
@@ -399,28 +398,28 @@ public class RdbDaoTest {
 		emp2.setENAME("ename");
 		entityList.add(emp2);
 
-		int[] counts = dao.insert(entityList);
+		int[] counts = client.insert(entityList);
 
-		counts = dao.update(entityList);
+		counts = client.update(entityList);
 		assertEquals(1, counts[0]);
 		assertEquals(1, counts[1]);
 		assertEquals(2, counts.length);
 
-		String sql = dao.getSqlLogRegistry().getLast().getCompleteSql();
+		String sql = client.getSqlLogRegistry().getLast().getCompleteSql();
 		assertMatches("UPDATE .* SET.*COMM = 2.*WHERE.*COMM = 1.*", sql);
 
-		counts = dao.update(entityList);
+		counts = client.update(entityList);
 		assertEquals(1, counts[0]);
 		assertEquals(1, counts[1]);
 		assertEquals(2, counts.length);
 
-		sql = dao.getSqlLogRegistry().getLast().getCompleteSql();
+		sql = client.getSqlLogRegistry().getLast().getCompleteSql();
 		assertMatches("UPDATE .* SET.*COMM = 3.*WHERE.*COMM = 2.*", sql);
 	}
 
 	@Test
 	public void testDeleteCollectionOfENTITY() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		List<Emp> entityList = new ArrayList<Emp>();
 		Emp emp1 = new Emp();
@@ -437,11 +436,11 @@ public class RdbDaoTest {
 		emp2.setENAME("ename");
 		entityList.add(emp2);
 
-		int[] counts = dao.insert(entityList);
+		int[] counts = client.insert(entityList);
 		assertEquals(1, counts[0]);
 		assertEquals(1, counts[1]);
 
-		counts = dao.delete(entityList);
+		counts = client.delete(entityList);
 		assertEquals(1, counts[0]);
 		assertEquals(1, counts[1]);
 		assertEquals(2, counts.length);
@@ -449,26 +448,26 @@ public class RdbDaoTest {
 
 	@Test
 	public void testExecuteUpdate() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 		String sql = "UPDATE EMP SET ENAME = /*name*/'SMITH' WHERE EMPNO = /*no*/1";
 
-		dao.executeUpdate(sql, args("name", "foo", "no", 7369));
-		Emp emp = dao.selectOne("select * from EMP where EMPNO = 7369", Emp.class).get();
+		client.executeUpdate(sql, args("name", "foo", "no", 7369));
+		Emp emp = client.selectOne("select * from EMP where EMPNO = 7369", Emp.class).get();
 		assertEquals("foo", emp.getENAME());
 	}
 
 	@Test
 	public void testExecuteBatch() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 		String sql = "UPDATE EMP SET ENAME = /*name*/'SMITH' WHERE EMPNO = /*no*/1";
 
 		List<Object> list = list(args("name", "foo", "no", 7369), args("name", "bar", "no", 7499), args("name", "baz", "no", -1));
-		int[] counts = dao.executeBatch(sql, list);
+		int[] counts = client.executeBatch(sql, list);
 
-		Emp emp = dao.selectOne("select * from EMP where EMPNO = 7369", Emp.class).get();
+		Emp emp = client.selectOne("select * from EMP where EMPNO = 7369", Emp.class).get();
 		assertEquals(1, counts[0]);
 		assertEquals("foo", emp.getENAME());
-		emp = dao.selectOne("select * from EMP where EMPNO = 7499", Emp.class).get();
+		emp = client.selectOne("select * from EMP where EMPNO = 7499", Emp.class).get();
 		assertEquals(1, counts[1]);
 		assertEquals("bar", emp.getENAME());
 		assertEquals(0, counts[2]);
@@ -476,29 +475,29 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelect() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 		Emp emp = new Emp();
 		emp.setCOMM("2");
 		emp.setDEPTNO("10");
 		emp.setEMPNO("1");
 		emp.setENAME("ename");
-		int count = dao.insert(emp);
+		int count = client.insert(emp);
 		assertEquals(1, count);
 
-		Emp selectEmp = dao.selectOne("SELECT * FROM EMP WHERE EMPNO = /*no*/0", args("no", 1), Emp.class).get();
+		Emp selectEmp = client.selectOne("SELECT * FROM EMP WHERE EMPNO = /*no*/0", args("no", 1), Emp.class).get();
 		assertEquals("1", selectEmp.getEMPNO());
 		assertEquals("ename", selectEmp.getENAME());
 		String completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP WHERE EMPNO = 1", completeSql);
 
-		selectEmp = dao.selectOne("SELECT * FROM EMP WHERE EMPNO = 1", Emp.class).get();
+		selectEmp = client.selectOne("SELECT * FROM EMP WHERE EMPNO = 1", Emp.class).get();
 		assertEquals("1", selectEmp.getEMPNO());
 		assertEquals("ename", selectEmp.getENAME());
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP WHERE EMPNO = 1", completeSql);
 
-		Map<String, Object> empMap = dao.selectOneMap("SELECT * FROM EMP WHERE EMPNO = 1").get();
+		Map<String, Object> empMap = client.selectOneMap("SELECT * FROM EMP WHERE EMPNO = 1").get();
 		assertEquals("1", empMap.get("EMPNO").toString());
 		assertEquals("1", empMap.get("empNo").toString());
 		assertEquals("1", empMap.get("EmPnO").toString());
@@ -508,43 +507,43 @@ public class RdbDaoTest {
 		assertEquals("SELECT * FROM EMP WHERE EMPNO = 1", completeSql);
 
 		List<Emp> result = null;
-		result = dao.select("SELECT * FROM EMP WHERE EMPNO = /*no*/0 AND ENAME = /*en*/'hoge'", args("en", "hoge", "no", 1), Emp.class);
+		result = client.select("SELECT * FROM EMP WHERE EMPNO = /*no*/0 AND ENAME = /*en*/'hoge'", args("en", "hoge", "no", 1), Emp.class);
 		assertEquals(0, result.size());
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP WHERE EMPNO = 1 AND ENAME = 'hoge'", completeSql);
 
-		result = dao.select("jp/dodododo/sql/impl/if.sql", args("no", 1), Emp.class);
+		result = client.select("jp/dodododo/sql/impl/if.sql", args("no", 1), Emp.class);
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertSql(getText("if_result_1.sql"), completeSql);
 
-		result = dao.select("jp/dodododo/sql/impl/if.sql", args("no", null), Emp.class);
+		result = client.select("jp/dodododo/sql/impl/if.sql", args("no", null), Emp.class);
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertSql(getText("if_result_2.sql"), completeSql);
 
-		result = dao.select("jp/dodododo/sql/impl/if_else.sql", args("no", null), Emp.class);
+		result = client.select("jp/dodododo/sql/impl/if_else.sql", args("no", null), Emp.class);
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertSql(getText("if_else_result_1.sql"), completeSql);
 
-		Map<String, Object> selectCount = dao.selectOneMap("SELECT COUNT(*) AS CNT FROM EMP").get();
+		Map<String, Object> selectCount = client.selectOneMap("SELECT COUNT(*) AS CNT FROM EMP").get();
 		assertEquals(15, ((Number) selectCount.get("cnt")).intValue());
 
-		BigDecimal decimal = dao.selectOneNumber("SELECT COUNT(*) AS CNT FROM EMP").get();
+		BigDecimal decimal = client.selectOneNumber("SELECT COUNT(*) AS CNT FROM EMP").get();
 		assertEquals(15, decimal.intValue());
 	}
 
 	@Test
 	public void testSelectMap() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 		Emp emp = new Emp();
 		emp.setCOMM("2");
 		emp.setDEPTNO("10");
 		emp.setEMPNO("1");
 		emp.setENAME("ename");
-		int count = dao.insert(emp);
+		int count = client.insert(emp);
 		assertEquals(1, count);
 		String sql = "SELECT * FROM EMP WHERE EMPNO = /*no*/0";
-		List<Map<String, Object>> selectMap = dao.selectMap(sql, args("no", 1));
+		List<Map<String, Object>> selectMap = client.selectMap(sql, args("no", 1));
 		Map<String, Object> selectEmp = selectMap.get(0);
 		assertEquals("1", selectEmp.get("EMPNO").toString());
 		assertEquals("ename", selectEmp.get("ENAME"));
@@ -554,10 +553,10 @@ public class RdbDaoTest {
 
 	@Test
 	public void testExistsRecord() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
-		boolean existsRecord = dao.existsRecord(from("emp"), where("empno", ge(0)));
+		boolean existsRecord = client.existsRecord(from("emp"), where("empno", ge(0)));
 		String sql = logRegistry.getLast().getCompleteSql();
 		assertTrue(StringUtil.equalsIgnoreCase("SELECT * FROM EMP WHERE EMPNO >= 0", sql));
 		assertTrue(existsRecord);
@@ -586,9 +585,9 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectManyToOne() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<EmpHasDept> empList = dao.select("jp/dodododo/sql/impl/many_to_one.sql", EmpHasDept.class);
+		List<EmpHasDept> empList = client.select("jp/dodododo/sql/impl/many_to_one.sql", EmpHasDept.class);
 		assertEquals(14, empList.size());
 		assertEquals("RESEARCH", empList.get(0).getDept().getDNAME());
 		for (EmpHasDept empHasDept : empList) {
@@ -598,10 +597,10 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectOneToMany() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		String sql = "jp/dodododo/sql/impl/one_to_many.sql";
-		List<DeptHasEmpList> deptList = dao.select(sql, DeptHasEmpList.class);
+		List<DeptHasEmpList> deptList = client.select(sql, DeptHasEmpList.class);
 		assertEquals(3, deptList.size());
 
 		assertEquals(3, deptList.get(0).getEmpList().size());
@@ -615,10 +614,10 @@ public class RdbDaoTest {
 
 	@Test
 	public void testNoParameterizedList() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		try {
-			dao.select("jp/dodododo/sql/impl/one_to_many.sql", DeptHasNoParameterizedList.class);
+			client.select("jp/dodododo/sql/impl/one_to_many.sql", DeptHasNoParameterizedList.class);
 			fail();
 		} catch (NoParameterizedException success) {
 		}
@@ -626,9 +625,9 @@ public class RdbDaoTest {
 
 	@Test
 	public void testRelationArray() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<DeptHasEnameArray> list = dao.select("jp/dodododo/sql/impl/one_to_many.sql", DeptHasEnameArray.class);
+		List<DeptHasEnameArray> list = client.select("jp/dodododo/sql/impl/one_to_many.sql", DeptHasEnameArray.class);
 		assertEquals(3, list.size());
 
 		DeptHasEnameArray dept = list.get(0);
@@ -647,9 +646,9 @@ public class RdbDaoTest {
 
 	@Test
 	public void testRelationArray2() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<DeptHasEmpArray> list = dao.select("jp/dodododo/sql/impl/one_to_many.sql", DeptHasEmpArray.class);
+		List<DeptHasEmpArray> list = client.select("jp/dodododo/sql/impl/one_to_many.sql", DeptHasEmpArray.class);
 		assertEquals(3, list.size());
 
 		DeptHasEmpArray dept = list.get(0);
@@ -663,9 +662,9 @@ public class RdbDaoTest {
 
 	@Test
 	public void testMixRelation() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<DeptHasEmpList2> deptList2 = dao.select("jp/dodododo/sql/impl/one_to_many.sql", DeptHasEmpList2.class);
+		List<DeptHasEmpList2> deptList2 = client.select("jp/dodododo/sql/impl/one_to_many.sql", DeptHasEmpList2.class);
 		assertEquals(3, deptList2.size());
 
 		assertEquals(3, deptList2.get(0).getEmpList().size());
@@ -680,9 +679,9 @@ public class RdbDaoTest {
 
 	@Test
 	public void testMixRelation2() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<DeptHasManager> deptList = dao.select("jp/dodododo/sql/impl/dept_manager_employees.sql", DeptHasManager.class);
+		List<DeptHasManager> deptList = client.select("jp/dodododo/sql/impl/dept_manager_employees.sql", DeptHasManager.class);
 		assertEquals(3, deptList.size());
 
 		DeptHasManager dept0 = deptList.get(0);
@@ -710,9 +709,9 @@ public class RdbDaoTest {
 
 	@Test
 	public void testMixRelation3() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<DeptHasManager> deptList = dao.select("jp/dodododo/sql/impl/dept_manager_employees2.sql", DeptHasManager.class);
+		List<DeptHasManager> deptList = client.select("jp/dodododo/sql/impl/dept_manager_employees2.sql", DeptHasManager.class);
 		assertEquals(3, deptList.size());
 
 		DeptHasManager dept0 = deptList.get(0);
@@ -745,17 +744,17 @@ public class RdbDaoTest {
 		if (dialect instanceof HSQL == false) {
 			return;
 		}
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
 		String sql = "select /*$bean.sysDate*/SYSDATE from /*$bean.dual*/DUAL ";
 		String actualSql = "select CURRENT_TIMESTAMP from INFORMATION_SCHEMA.SYSTEM_TABLES WHERE table_name = 'SYSTEM_TABLES'";
 
 		@SuppressWarnings("unused")
-		List<Map<String, Object>> result = dao.selectMap(sql, args("bean", new Embedded()));
+		List<Map<String, Object>> result = client.selectMap(sql, args("bean", new Embedded()));
 		assertEquals(actualSql, logRegistry.getLast().getRawSql());
 
-		result = dao.selectMap(sql, args("bean", new Embedded2()));
+		result = client.selectMap(sql, args("bean", new Embedded2()));
 		assertEquals(actualSql, logRegistry.getLast().getRawSql());
 
 	}
@@ -790,33 +789,33 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectOrderBy() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
 		@SuppressWarnings("unused")
-		List<Emp> empList = dao.select("SELECT * FROM EMP /*ORDER BY @SqlUtil@orderBy(orderBy)*/ORDER BY EMPNO /*END*/",
+		List<Emp> empList = client.select("SELECT * FROM EMP /*ORDER BY @SqlUtil@orderBy(orderBy)*/ORDER BY EMPNO /*END*/",
 				orderBy("ENAME", ASC, "EMPNO", DESC), Emp.class);
 		String completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP ORDER BY ENAME ASC, EMPNO DESC", completeSql);
 
-		empList = dao.select("SELECT * FROM EMP /*ORDER BY @SqlUtil@orderBy(orderBy)*/ORDER BY EMPNO /*END*/", orderBy(), Emp.class);
+		empList = client.select("SELECT * FROM EMP /*ORDER BY @SqlUtil@orderBy(orderBy)*/ORDER BY EMPNO /*END*/", orderBy(), Emp.class);
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP", completeSql.trim());
 
-		empList = dao.select(BY, query(table("EMP"), orderBy("EMPNO", ASC)), Emp.class);
+		empList = client.select(BY, query(table("EMP"), orderBy("EMPNO", ASC)), Emp.class);
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertTrue(StringUtil.equalsIgnoreCase("SELECT * FROM EMP ORDER BY EMPNO ASC", completeSql.trim()));
 
-		empList = dao.select(BY, query(table("EMP"), "ENAME", "mike", orderBy("EMPNO", ASC)), Emp.class);
+		empList = client.select(BY, query(table("EMP"), "ENAME", "mike", orderBy("EMPNO", ASC)), Emp.class);
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertTrue(StringUtil.equalsIgnoreCase("SELECT * FROM EMP WHERE ENAME = 'mike' ORDER BY EMPNO ASC", completeSql.trim()));
 	}
 
 	@Test
 	public void testSelectEnum() throws Exception {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		EmpHasEnumDept emp = dao.selectOne("SELECT EMPNO, ENAME, DEPTNO, DEPTNO AS DEPT FROM EMP WHERE EMPNO=7369", EmpHasEnumDept.class).get();
+		EmpHasEnumDept emp = client.selectOne("SELECT EMPNO, ENAME, DEPTNO, DEPTNO AS DEPT FROM EMP WHERE EMPNO=7369", EmpHasEnumDept.class).get();
 		assertEquals("7369", emp.getEMPNO());
 		assertEquals("SMITH", emp.getENAME());
 		assertEquals(EnumDept.RESEARCH, emp.getDept());
@@ -825,10 +824,10 @@ public class RdbDaoTest {
 
 	@Test
 	public void testNestIfSql() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 		@SuppressWarnings("unused")
-		List<Map<String, Object>> result = dao.selectMap("jp/dodododo/sql/impl/nest_if.sql");
+		List<Map<String, Object>> result = client.selectMap("jp/dodododo/sql/impl/nest_if.sql");
 
 		String completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP", completeSql.trim());
@@ -836,10 +835,10 @@ public class RdbDaoTest {
 
 	@Test
 	public void testNestIfSql2() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 		@SuppressWarnings("unused")
-		List<Map<String, Object>> result = dao.selectMap("jp/dodododo/sql/impl/nest_if2.sql");
+		List<Map<String, Object>> result = client.selectMap("jp/dodododo/sql/impl/nest_if2.sql");
 
 		String completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP", completeSql.trim());
@@ -847,10 +846,10 @@ public class RdbDaoTest {
 
 	@Test
 	public void testNestIfSql3() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 		@SuppressWarnings("unused")
-		List<Map<String, Object>> result = dao.selectMap("jp/dodododo/sql/impl/nest_if3.sql");
+		List<Map<String, Object>> result = client.selectMap("jp/dodododo/sql/impl/nest_if3.sql");
 
 		String completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP\nwhere\nEMPNO = EMPNO", completeSql.trim());
@@ -858,20 +857,20 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSelectPaging() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		String sql = "select * from EMP order by empno";
-		List<Emp> allList = dao.select(sql, Emp.class);
-		List<Emp> list0 = dao.select(sql, args(new Paging(2, 0)), Emp.class);
-		List<Emp> list1 = dao.select(sql, args(new Paging(2, 1)), Emp.class);
+		List<Emp> allList = client.select(sql, Emp.class);
+		List<Emp> list0 = client.select(sql, args(new Paging(2, 0)), Emp.class);
+		List<Emp> list1 = client.select(sql, args(new Paging(2, 1)), Emp.class);
 
 		assertEquals(allList.get(0).getEMPNO(), list0.get(0).getEMPNO());
 		assertEquals(allList.get(1).getEMPNO(), list0.get(1).getEMPNO());
 		assertEquals(allList.get(2).getEMPNO(), list1.get(0).getEMPNO());
 		assertEquals(allList.get(3).getEMPNO(), list1.get(1).getEMPNO());
 
-		list0 = dao.select(sql, args(/* dummy */"a", "", new LimitOffset(2, 0)), Emp.class);
-		list1 = dao.select(sql, args(/* dummy */"b", "", new LimitOffset(2, 2)), Emp.class);
+		list0 = client.select(sql, args(/* dummy */"a", "", new LimitOffset(2, 0)), Emp.class);
+		list1 = client.select(sql, args(/* dummy */"b", "", new LimitOffset(2, 2)), Emp.class);
 		assertEquals(allList.get(0).getEMPNO(), list0.get(0).getEMPNO());
 		assertEquals(allList.get(1).getEMPNO(), list0.get(1).getEMPNO());
 		assertEquals(allList.get(2).getEMPNO(), list1.get(0).getEMPNO());
@@ -880,13 +879,13 @@ public class RdbDaoTest {
 
 	@Test
 	public void testIterationCallback1() throws Exception {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		final AtomicInteger count = new AtomicInteger(0);
 		String sql = "select * from EMP order by empno";
 		assertEquals(0, count.intValue());
 
-		dao.select(sql, Emp.class, emp -> {
+		client.select(sql, Emp.class, emp -> {
 			count.set(count.intValue() + 1);
 			logger.debug("{}", emp);
 		});
@@ -896,13 +895,13 @@ public class RdbDaoTest {
 	@SuppressWarnings("unused")
 	@Test
 	public void testIterationCallback2() throws Exception {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		final AtomicInteger count = new AtomicInteger(0);
 		String sql = "select * from EMP order by empno";
 		assertEquals(0, count.intValue());
 
-		dao.select(sql, Emp.class, new jp.dodododo.sql.script.Each() {
+		client.select(sql, Emp.class, new jp.dodododo.sql.script.Each() {
 			public void each(Emp it) {
 				count.set(count.intValue() + 1);
 				logger.debug("" + it);
@@ -913,14 +912,14 @@ public class RdbDaoTest {
 
 	@Test
 	public void testIn() throws Exception {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
 		List<String> empnoList = new ArrayList<String>();
 		empnoList.add("1");
 		empnoList.add("2");
 		@SuppressWarnings("unused")
-		Map<String, Object> selectOneMap = dao.selectOneMap("SELECT * FROM EMP WHERE EMPNO IN /*empno*/'0'",
+		Map<String, Object> selectOneMap = client.selectOneMap("SELECT * FROM EMP WHERE EMPNO IN /*empno*/'0'",
 				args("empno", empnoList)).orElse(new HashMap<>());
 		String completeSql = logRegistry.getLast().getCompleteSql();
 		assertEquals("SELECT * FROM EMP WHERE EMPNO IN ('1', '2')", completeSql);
@@ -928,175 +927,175 @@ public class RdbDaoTest {
 
 	@Test
 	public void testSimpleSql() throws Exception {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 		logRegistry.clear();
 
 		Emp query = new Emp();
 		query.setEMPNO("1");
-		dao.select(ALL, query);
+		client.select(ALL, query);
 		String completeSql = logRegistry.get(0).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP", completeSql);
 		assertTrue(StringUtil.equalsIgnoreCase("SELECT * FROM EMP", completeSql));
 
-		dao.select(SIMPLE_WHERE, query);
+		client.select(SIMPLE_WHERE, query);
 		completeSql = logRegistry.get(1).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO = '1'", completeSql);
 
-		dao.select(COUNT_ALL, query);
+		client.select(COUNT_ALL, query);
 		completeSql = logRegistry.get(2).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT count(*) FROM EMP", completeSql);
 
-		dao.select(SIMPLE_COUNT_WHERE, query);
+		client.select(SIMPLE_COUNT_WHERE, query);
 		completeSql = logRegistry.get(3).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT count(*) FROM EMP WHERE EMPNO = '1'", completeSql);
 
-		dao.selectOne(SIMPLE_COUNT_WHERE, query);
+		client.selectOne(SIMPLE_COUNT_WHERE, query);
 		completeSql = logRegistry.get(4).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT count(*) FROM EMP WHERE EMPNO = '1'", completeSql);
 
-		dao.selectOneNumber(COUNT_ALL, query);
+		client.selectOneNumber(COUNT_ALL, query);
 		completeSql = logRegistry.get(5).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT count(*) FROM EMP", completeSql);
 
-		dao.select(BY, query);
+		client.select(BY, query);
 		completeSql = logRegistry.get(6).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO = '1'", completeSql);
 
-		dao.select(BY, query("tableName", "EMP", "EMPNO", "1"));
+		client.select(BY, query("tableName", "EMP", "EMPNO", "1"));
 		completeSql = logRegistry.get(7).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO = '1'", completeSql);
 	}
 
 	@Test
 	public void testSimpleSqlMap() throws Exception {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
 		Map<String, Object> query = new HashMap<String, Object>();
 		query.put("table_Name", "emp");
 		query.put("EMPNO", "1");
-		dao.selectMap(ALL, query);
+		client.selectMap(ALL, query);
 		String completeSql = logRegistry.get(0).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP", completeSql);
 
-		dao.selectMap(SIMPLE_WHERE, query);
+		client.selectMap(SIMPLE_WHERE, query);
 		completeSql = logRegistry.get(1).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO = '1'", completeSql);
 
-		dao.selectMap(COUNT_ALL, query);
+		client.selectMap(COUNT_ALL, query);
 		completeSql = logRegistry.get(2).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT count(*) FROM EMP", completeSql);
 
-		dao.selectMap(SIMPLE_COUNT_WHERE, query);
+		client.selectMap(SIMPLE_COUNT_WHERE, query);
 		completeSql = logRegistry.get(3).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT count(*) FROM EMP WHERE EMPNO = '1'", completeSql);
 
-		dao.selectOneMap(SIMPLE_COUNT_WHERE, query);
+		client.selectOneMap(SIMPLE_COUNT_WHERE, query);
 		completeSql = logRegistry.get(4).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT count(*) FROM EMP WHERE EMPNO = '1'", completeSql);
 
-		dao.selectOneNumber(COUNT_ALL, query);
+		client.selectOneNumber(COUNT_ALL, query);
 		completeSql = logRegistry.get(5).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT count(*) FROM EMP", completeSql);
 
-		dao.selectMap(from("emp"), by("empno", eq("1")));
-		completeSql = dao.getSqlLogRegistry().get(1).getCompleteSql();
+		client.selectMap(from("emp"), by("empno", eq("1")));
+		completeSql = client.getSqlLogRegistry().get(1).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO = '1'", completeSql);
 
-		dao.selectOneMap(from("emp"), by("empno", eq("1")));
-		completeSql = dao.getSqlLogRegistry().get(1).getCompleteSql();
+		client.selectOneMap(from("emp"), by("empno", eq("1")));
+		completeSql = client.getSqlLogRegistry().get(1).getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO = '1'", completeSql);
 	}
 
 	@Test
 	public void testOperator() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
-		List<Row> select = dao.select(Row.class, from("emp"), where("empno", eq(1)));
+		List<Row> select = client.select(Row.class, from("emp"), where("empno", eq(1)));
 		String completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO = 1", completeSql);
 		assertEquals(0, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", ne(1)));
+		select = client.select(Row.class, from("emp"), where("empno", ne(1)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO <> 1", completeSql);
 		assertEquals(14, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", lt(1)));
+		select = client.select(Row.class, from("emp"), where("empno", lt(1)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO < 1", completeSql);
 		assertEquals(0, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", le(1)));
+		select = client.select(Row.class, from("emp"), where("empno", le(1)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO <= 1", completeSql);
 		assertEquals(0, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", gt(1)));
+		select = client.select(Row.class, from("emp"), where("empno", gt(1)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO > 1", completeSql);
 		assertEquals(14, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", ge(1)));
+		select = client.select(Row.class, from("emp"), where("empno", ge(1)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO >= 1", completeSql);
 		assertEquals(14, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", in(1)));
+		select = client.select(Row.class, from("emp"), where("empno", in(1)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO IN (1)", completeSql);
 		assertEquals(0, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", in(1, 7369)));
+		select = client.select(Row.class, from("emp"), where("empno", in(1, 7369)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO IN (1, 7369)", completeSql);
 		assertEquals(1, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", notIn(1)));
+		select = client.select(Row.class, from("emp"), where("empno", notIn(1)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO NOT IN (1)", completeSql);
 		assertEquals(14, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("empno", notIn(1, 7369)));
+		select = client.select(Row.class, from("emp"), where("empno", notIn(1, 7369)));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE EMPNO NOT IN (1, 7369)", completeSql);
 		assertEquals(13, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("ename", like("I")));
+		select = client.select(Row.class, from("emp"), where("ename", like("I")));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE ENAME LIKE '%I%'", completeSql);
 		assertEquals(4, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("ename", notLike("I")));
+		select = client.select(Row.class, from("emp"), where("ename", notLike("I")));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE ENAME NOT LIKE '%I%'", completeSql);
 		assertEquals(10, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("ename", contains("I")));
+		select = client.select(Row.class, from("emp"), where("ename", contains("I")));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE ENAME LIKE '%I%'", completeSql);
 		assertEquals(4, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("ename", notContains("I")));
+		select = client.select(Row.class, from("emp"), where("ename", notContains("I")));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE ENAME NOT LIKE '%I%'", completeSql);
 		assertEquals(10, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("ename", isNull()));
+		select = client.select(Row.class, from("emp"), where("ename", isNull()));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE ENAME IS NULL", completeSql);
 		assertEquals(0, select.size());
 
-		select = dao.select(Row.class, from("emp"), where("ename", isNotNull()));
+		select = client.select(Row.class, from("emp"), where("ename", isNotNull()));
 		completeSql = logRegistry.getLast().getCompleteSql();
 		assertEqualsIgnoreCase("SELECT * FROM EMP WHERE ENAME IS NOT NULL", completeSql);
 		assertEquals(14, select.size());
 	}
 
 	public void _testPerformance() throws Exception {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < 1000; i++) {
@@ -1104,7 +1103,7 @@ public class RdbDaoTest {
 			emp.setCOMM("2");
 			emp.setDEPTNO("1");
 			emp.setENAME("ename");
-			int count = dao.insert(emp);
+			int count = client.insert(emp);
 			if (count != 1) {
 				fail();
 			}
@@ -1212,13 +1211,13 @@ public class RdbDaoTest {
 
 	@Test
 	public void testDeleteFromTowPk() throws Exception {
-		dao = newTestClient(getConnection());
+		client = newTestClient(getConnection());
 		TwoPkTable twoPk = new TwoPkTable();
 		twoPk.PK1 = 1;
 		twoPk.PK2 = 2;
-		dao.insert(twoPk);
-		dao.update(twoPk);
-		dao.delete(twoPk);
+		client.insert(twoPk);
+		client.update(twoPk);
+		client.delete(twoPk);
 	}
 
 	public static class TwoPkTable {
@@ -1237,33 +1236,33 @@ public class RdbDaoTest {
 
 	@Test
 	public void testLambda() throws Exception {
-		dao = newTestClient(getConnection());
+		client = newTestClient(getConnection());
 
-		Long sum1 = dao.selectOne("select sum(sal) from EMP", Long.class).get();
+		Long sum1 = client.selectOne("select sum(sal) from EMP", Long.class).get();
 		AtomicLong sum2 = new AtomicLong(0);
 		AtomicLong sum3 = new AtomicLong(0);
-		dao.select("select *   from EMP", Row.class, System.out::println);
-		dao.select("select *   from EMP", Row.class, row -> { sum2.addAndGet(row.getLong("sal")); });
-		dao.select("select sal from EMP", Long.class, sal -> { sum3.addAndGet(sal); });
+		client.select("select *   from EMP", Row.class, System.out::println);
+		client.select("select *   from EMP", Row.class, row -> { sum2.addAndGet(row.getLong("sal")); });
+		client.select("select sal from EMP", Long.class, sal -> { sum3.addAndGet(sal); });
 		assertEquals(sum1.longValue(), sum2.longValue());
 		assertEquals(sum1.longValue(), sum3.longValue());
 	}
 
 	@Test
 	public void testRecordObject()throws Exception {
-		dao = newTestClient(getConnection());
+		client = newTestClient(getConnection());
 		Dept dept = new Dept();
 		dept.setDEPTNO("10");
 		RecordEmp recordEmp = new RecordEmp(new EntityId(), "name1", "job2", "1", null, "100", "3", dept, null);
 		logger.debug("before insert: empno={}, id={}", recordEmp.empno(), System.identityHashCode(recordEmp.empno()));
-		dao.insert(recordEmp);
+		client.insert(recordEmp);
 
 		assertTrue(recordEmp.empno().isAssigned());
 		assertTrue(recordEmp.empno().asLong() > 0);
 
 		Long empNo = recordEmp.empno().asLong();
 
-		Optional<RecordEmp> recordEmp1 = dao.selectOne(RecordEmp.class, by("empno", empNo));
+		Optional<RecordEmp> recordEmp1 = client.selectOne(RecordEmp.class, by("empno", empNo));
 		recordEmp1.ifPresentOrElse(emp -> {
 			assertTrue(emp.empno().isAssigned());
 			assertEquals(recordEmp.empno().asLong(), emp.empno().asLong());
@@ -1276,7 +1275,7 @@ public class RdbDaoTest {
 
 		// use record in condition
 		RecordEmp condition = recordEmp;
-		Optional<RecordEmp> recordEmp2 = dao.selectOne(RecordEmp.class, condition);
+		Optional<RecordEmp> recordEmp2 = client.selectOne(RecordEmp.class, condition);
 		recordEmp2.ifPresentOrElse(emp -> {
 					assertTrue(emp.empno().isAssigned());
 					assertEquals(recordEmp.empno().asLong(), emp.empno().asLong());
@@ -1291,18 +1290,18 @@ public class RdbDaoTest {
 
 	@Test
 	public void testRecordDeptHasRecordEmpList() throws Exception {
-		dao = newTestClient(getConnection());
+		client = newTestClient(getConnection());
 
-		List<RecordDept> deptList = dao.select("SELECT * FROM dept JOIN emp ON dept.deptno = emp.deptno ORDER BY dept.deptno, emp.empno", RecordDept.class);
+		List<RecordDept> deptList = client.select("SELECT * FROM dept JOIN emp ON dept.deptno = emp.deptno ORDER BY dept.deptno, emp.empno", RecordDept.class);
 		assertEquals(3, deptList.size());
 		assertEquals(3, deptList.get(0).empList().size());
 		assertEquals(5, deptList.get(1).empList().size());
 		assertEquals(6, deptList.get(2).empList().size());
 
 		RecordDept test = new RecordDept(new EntityId(), "test", new ArrayList<>());
-		dao.insert(test);
+		client.insert(test);
 
-		deptList = dao.select("SELECT * FROM dept LEFT JOIN emp ON dept.deptno = emp.deptno ORDER BY dept.deptno, emp.empno", RecordDept.class);
+		deptList = client.select("SELECT * FROM dept LEFT JOIN emp ON dept.deptno = emp.deptno ORDER BY dept.deptno, emp.empno", RecordDept.class);
 		System.out.println(deptList);
 		assertEquals(5, deptList.size());
 		assertEquals(0, deptList.get(0).empList().size());
@@ -1314,18 +1313,18 @@ public class RdbDaoTest {
 
 	@Test
 	public void testDaoEntity()throws Exception {
-		dao = newTestClient(getConnection());
+		client = newTestClient(getConnection());
 		Dept dept = new Dept();
 		dept.setDEPTNO("10");
 		EmpWithSqlEntity emp = new EmpWithSqlEntity( "name1",  dept);
 		emp.init("ename1", "job2", "1");
-		dao.insert(emp);
+		client.insert(emp);
 
 		assertTrue(Long.valueOf(emp.getEmpNo()) > 0);
 
 		String empNo = emp.getEmpNo();
 
-		Optional<EmpWithSqlEntity> savedEmp = dao.selectOne(EmpWithSqlEntity.class, by("empno", empNo));
+		Optional<EmpWithSqlEntity> savedEmp = client.selectOne(EmpWithSqlEntity.class, by("empno", empNo));
 		savedEmp.ifPresentOrElse(e -> {
 					assertEquals(Long.valueOf(emp.getEmpNo()), Long.valueOf(e.getEmpNo()));
 					assertEquals("ename1", e.ename());

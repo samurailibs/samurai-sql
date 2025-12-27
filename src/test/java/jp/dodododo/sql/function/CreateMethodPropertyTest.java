@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
@@ -29,11 +29,11 @@ public class CreateMethodPropertyTest {
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
 		Emp emp = new Emp();
 		emp.dept = new Dept();
@@ -44,11 +44,11 @@ public class CreateMethodPropertyTest {
 		emp.TSTAMP = null;
 		emp.TSTAMP = new Date();
 		emp.NAME = "ename";
-		dao.insert("emp", emp);
-		// dao.insert(emp.dept);
+		client.insert("emp", emp);
+		// client.insert(emp.dept);
 		String empNo = emp.EMPNO;
 
-		List<Emp> select = dao.select(
+		List<Emp> select = client.select(
 				"select EMP.deptno as deptno from EMP, DEPT where EMP.deptno = DEPT.deptno and empno = "
 						+ empNo, Emp.class);
 

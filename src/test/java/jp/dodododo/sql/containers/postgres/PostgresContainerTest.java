@@ -1,7 +1,7 @@
 package jp.dodododo.sql.containers.postgres;
 
-import jp.dodododo.sql.Dao;
-import jp.dodododo.sql.impl.RdbDao;
+import jp.dodododo.sql.SamuraiSqlClient;
+import jp.dodododo.sql.impl.SamuraiSqlClientImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -122,13 +122,13 @@ class PostgresContainerTest {
     @Test
     void selectDept() throws Exception {
         try (Connection connection = dataSource.getConnection()) {
-            Dao dao = new RdbDao(connection);
+            SamuraiSqlClient client = new SamuraiSqlClientImpl(connection);
             PostgresDept dept = new PostgresDept();
             dept.setDName("test1");
 
-            dao.insert(dept);
+            client.insert(dept);
 
-            Optional<BigDecimal> deptno = dao.selectOneNumber("select deptno from dept");
+            Optional<BigDecimal> deptno = client.selectOneNumber("select deptno from dept");
             deptno.ifPresentOrElse(
                     num -> Assertions.assertEquals(num.longValue(), dept.getDeptNo())
                     , () -> {

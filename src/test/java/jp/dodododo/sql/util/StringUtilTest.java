@@ -69,7 +69,7 @@ public class StringUtilTest {
 		assertEquals(0, StringUtil.length(""));
 		assertEquals(8, StringUtil.length("aAzZ 190"));
 		assertEquals(17, StringUtil.length("aAzZ190あいうえお"));
-		assertEquals(11, StringUtil.length("サムライDAO"));
-		assertEquals(7, StringUtil.length("ｻﾑﾗｲDAO"));
+		assertEquals(11, StringUtil.length("サムライSQL"));
+		assertEquals(7, StringUtil.length("ｻﾑﾗｲSQL"));
 	}
 }

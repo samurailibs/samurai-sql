@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.NumKey;
 import jp.dodododo.sql.unit.DbTestExtension;
 
@@ -19,13 +19,13 @@ public class HasListOfEnumPropertyTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<Dept> deptList = dao
+		List<Dept> deptList = client
 				.select("SELECT DEPT.DEPTNO as DEPTNO, EMPNO FROM DEPT, EMP where DEPT.DEPTNO = EMP.DEPTNO AND DEPT.DEPTNO = 10",
 						Dept.class);
 

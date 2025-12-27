@@ -10,7 +10,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
@@ -27,13 +27,13 @@ public class CreateMethodTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testMethodCreateBean() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<Emp> select = dao.select("select EMPNO, DEPT.DEPTNO as DEPTNO from EMP, DEPT where EMP.deptno = DEPT.deptno ",
+		List<Emp> select = client.select("select EMPNO, DEPT.DEPTNO as DEPTNO from EMP, DEPT where EMP.deptno = DEPT.deptno ",
 				Emp.class);
 
 		for (Emp selectedEmp : select) {
@@ -53,9 +53,9 @@ public class CreateMethodTest {
 
 	@Test
 	public void testMethodCreateConstructor() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<Emp2> select = dao.select("select EMPNO, DEPT.deptno as deptno from EMP, DEPT where EMP.deptno = DEPT.deptno ",
+		List<Emp2> select = client.select("select EMPNO, DEPT.deptno as deptno from EMP, DEPT where EMP.deptno = DEPT.deptno ",
 				Emp2.class);
 
 		for (Emp selectedEmp : select) {
@@ -75,9 +75,9 @@ public class CreateMethodTest {
 
 	@Test
 	public void testMethodCreateClass() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		List<Emp3> select = dao.select("select EMPNO, DEPT.deptno as deptno from EMP, DEPT where EMP.deptno = DEPT.deptno ",
+		List<Emp3> select = client.select("select EMPNO, DEPT.deptno as deptno from EMP, DEPT where EMP.deptno = DEPT.deptno ",
 				Emp3.class);
 
 		for (Emp selectedEmp : select) {

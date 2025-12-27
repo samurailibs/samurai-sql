@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.NumKey;
 import jp.dodododo.sql.annotation.StringKey;
 import jp.dodododo.sql.exception.SQLRuntimeException;
@@ -28,51 +28,51 @@ public class ExecuteXxxTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertUpdateAndDelete() {
-		dao = newTestClient(getDataSource());
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(getDataSource());
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
-		dao.execute(INSERT, args(TABLE_NAME, "emp", //
+		client.execute(INSERT, args(TABLE_NAME, "emp", //
 				"EMPNO", 100, //
 				"ENAME", "name"));
 
-		Map<String, Object> actual = dao.selectOneMap("select * from EMP where empno=100").get();
+		Map<String, Object> actual = client.selectOneMap("select * from EMP where empno=100").get();
 		assertEquals("name", actual.get("ename"));
 
-		dao.execute(UPDATE, args(TABLE_NAME, "emp", //
+		client.execute(UPDATE, args(TABLE_NAME, "emp", //
 				"EMPNO", 100, //
 				"ENAME", "name2"));
-		actual = dao.selectOneMap("select * from EMP where empno=100").get();
+		actual = client.selectOneMap("select * from EMP where empno=100").get();
 		assertEquals("name2", actual.get("ename"));
 
-		dao.execute(DELETE, args(TABLE_NAME, "EMP", //
+		client.execute(DELETE, args(TABLE_NAME, "EMP", //
 				"EMPNO", 100));
-		Optional<Map<String, Object>> actual2 = dao.selectOneMap("select * from EMP where empno=100");
+		Optional<Map<String, Object>> actual2 = client.selectOneMap("select * from EMP where empno=100");
 		assertFalse(actual2.isPresent());
 
-		dao.execute(DELETE_ALL, args(TABLE_NAME, "emp"));
-		BigDecimal count = dao.selectOneNumber(COUNT_ALL, args(TABLE_NAME, "emp")).get();
+		client.execute(DELETE_ALL, args(TABLE_NAME, "emp"));
+		BigDecimal count = client.selectOneNumber(COUNT_ALL, args(TABLE_NAME, "emp")).get();
 		assertEquals(0, count.intValue());
 
-		dao.execute(INSERT, into("emp"), //
+		client.execute(INSERT, into("emp"), //
 				values("EMPNO", 100, //
 						"ENAME", "name"));
-		count = dao.selectOneNumber(COUNT_ALL, args(TABLE_NAME, "emp")).get();
+		count = client.selectOneNumber(COUNT_ALL, args(TABLE_NAME, "emp")).get();
 		assertEquals(1, count.intValue());
 
-		dao.execute(INSERT, into(Emp.class), //
+		client.execute(INSERT, into(Emp.class), //
 				values("EMPNO", EmpNo.TEST_NO, //
 						"ENAME", Ename.TEST_NAME));
 		String sql = logRegistry.getLast().getCompleteSql();
 		assertTrue(StringUtil.equalsIgnoreCase("INSERT INTO EMP (EMPNO ,ENAME) VALUES (101 ,'TEST_NAME')", sql), sql);
-		count = dao.selectOneNumber(COUNT_ALL, args(TABLE_NAME, "emp")).get();
+		count = client.selectOneNumber(COUNT_ALL, args(TABLE_NAME, "emp")).get();
 		assertEquals(2, count.intValue());
 
 		try {
-			dao.executeInsert("INSERT INTO EMP (ENAME ,EMPNO) VALUES ( /*ENAME*/'TEST_NAME' , /*EMPNO*/101 ) ",
+			client.executeInsert("INSERT INTO EMP (ENAME ,EMPNO) VALUES ( /*ENAME*/'TEST_NAME' , /*EMPNO*/101 ) ",
 					args("ENAME", Ename.TEST_NAME, "EMPNO", EmpNo.TEST_NO));
 			fail();
 		} catch (SQLRuntimeException uniqueKeyError) {

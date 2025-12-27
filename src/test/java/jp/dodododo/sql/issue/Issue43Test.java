@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Map;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.row.Row;
@@ -21,13 +21,13 @@ public class Issue43Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void test() throws Exception {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
-		List<Emp> empList = dao.select(ALL, Emp.class);
+		List<Emp> empList = client.select(ALL, Emp.class);
 		for (Emp emp : empList) {
 			assertNotNull(emp.empno);
 			assertNotNull(emp.dept.deptno);

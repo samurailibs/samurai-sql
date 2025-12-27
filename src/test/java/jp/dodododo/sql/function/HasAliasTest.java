@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
 import jp.dodododo.sql.annotation.IdDefSet;
@@ -27,11 +27,11 @@ public class HasAliasTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 		Emp emp = new Emp("", "");
 		emp.no = "10";
 		emp.c = "foo";
@@ -39,11 +39,11 @@ public class HasAliasTest {
 		emp.no = "10";
 		emp.TSTAMP = null;
 		emp.TSTAMP = new Date();
-		int count = dao.insert("EMP", emp);
+		int count = client.insert("EMP", emp);
 		assertEquals(1, count);
 		String empNo = emp.EMPNO;
 
-		List<Emp> select = dao.select("select * from EMP where EMPNO =" + empNo, Emp.class);
+		List<Emp> select = client.select("select * from EMP where EMPNO =" + empNo, Emp.class);
 		assertEquals(empNo, select.get(0).EMPNO);
 		assertEquals("foo", select.get(0).NAME);
 		assertEquals("10", select.get(0).no);

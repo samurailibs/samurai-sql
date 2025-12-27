@@ -8,6 +8,7 @@ import java.util.Date;
 
 import jp.dodododo.sql.exception.SQLRuntimeException;
 import jp.dodododo.sql.impl.RdbDao;
+import jp.dodododo.sql.impl.SamuraiSqlClientImpl;
 import jp.dodododo.sql.unit.DbTestExtension;
 
 import org.junit.jupiter.api.Test;
@@ -18,18 +19,18 @@ public class NoPersistentColumnInsertTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private RdbDao dao;
+	private SamuraiSqlClientImpl client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = new RdbDao(dbTestExtension.getDataSource());
+		client = new RdbDao(dbTestExtension.getDataSource());
 
-		int count = dao.insert("emp", Emp.EMP, npc("ename", "COMM", "deptNo", "HIREDATE", "MGR", "SAL", "TSTAMP", "JOB"));
+		int count = client.insert("emp", Emp.EMP, npc("ename", "COMM", "deptNo", "HIREDATE", "MGR", "SAL", "TSTAMP", "JOB"));
 		assertEquals(1, count);
-		assertEqualsIgnoreCase("INSERT INTO emp ( EMPNO ) VALUES ( 1 )", dao.getSqlLogRegistry().getLast().getCompleteSql());
+		assertEqualsIgnoreCase("INSERT INTO emp ( EMPNO ) VALUES ( 1 )", client.getSqlLogRegistry().getLast().getCompleteSql());
 
 		try {
-			count = dao.insert("emp", Emp.EMP);
+			count = client.insert("emp", Emp.EMP);
 			fail();
 		} catch (SQLRuntimeException success) {
 		}

@@ -7,7 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.config.SqlConfig;
 import jp.dodododo.sql.row.Row;
 import jp.dodododo.sql.sql.GenericSql;
@@ -23,7 +23,7 @@ public class Issue36Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -32,17 +32,17 @@ public class Issue36Test {
 
 	@Test
 	public void test() throws ParseException {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
 		EMP emp = new EMP();
 		emp.EMPNO = "1";
 		emp.HIREDATE = "2000-02-02";
 		emp.TSTAMP = "2000/01/01";
 
-		int count = dao.execute(GenericSql.INSERT, emp, emp);
+		int count = client.execute(GenericSql.INSERT, emp, emp);
 		assertEquals(1, count);
 
-		Row row= dao.selectOne("SELECT * FROM EMP WHERE EMPNO = 1", Row.class).get();
+		Row row= client.selectOne("SELECT * FROM EMP WHERE EMPNO = 1", Row.class).get();
 		assertEquals(new SimpleDateFormat("yyyyMMdd").parse("20000202"), TypeConverter.convert(row.getObject("HIREDATE"), Date.class));
 		assertEquals(new SimpleDateFormat("yyyyMMdd").parse("20000101"), TypeConverter.convert(row.getObject("TSTAMP"), Date.class));
 	}

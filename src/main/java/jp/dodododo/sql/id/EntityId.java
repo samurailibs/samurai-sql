@@ -16,7 +16,7 @@ import java.util.UUID;
  * record Emp(EntityId id, String name) {}
  *
  * Emp e = new Emp(new EntityId(), "alice");
- * dao.insert(e);          // The DAO calls e.id.assign(generatedId)
+ * client.insert(e);          // The client calls e.id.assign(generatedId)
  * Long id = e.id.asLong();
  * }</pre>
  *

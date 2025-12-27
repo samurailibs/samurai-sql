@@ -111,8 +111,8 @@ public class PropertyDesc implements AnnotatedElement {
 		this.field = f;
 		setPropertyType(f.getType());
 		this.genericPropertyType = f.getGenericType();
-		SqlEntity daoEntity = objectDesc.getTargetClass().getAnnotation(SqlEntity.class);
-		if (daoEntity != null) {
+		SqlEntity sqlEntity = objectDesc.getTargetClass().getAnnotation(SqlEntity.class);
+		if (sqlEntity != null) {
 			if (!FieldUtil.isFinal(f)) {
 				writable = true;
 			}

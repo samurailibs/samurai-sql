@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.types.TypeConverter;
 import jp.dodododo.sql.unit.DbTestExtension;
 
@@ -17,11 +17,11 @@ public class SomeEntitiesTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsert() {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
 		Emp e = new Emp();
 		e.EMPNO = "100";
@@ -37,9 +37,9 @@ public class SomeEntitiesTest {
 		misc.COMM = "1";
 		misc.TSTAMP = null;
 
-		dao.insert("EMP", e, d, misc);
+		client.insert("EMP", e, d, misc);
 
-		Map<String, Object> result = dao.selectOneMap("select * from EMP where EMPNO = 100").get();
+		Map<String, Object> result = client.selectOneMap("select * from EMP where EMPNO = 100").get();
 		TypeConverter converter = new TypeConverter(result);
 		assertEquals(Integer.valueOf("1"), converter.getInteger("COMM"));
 		assertEquals(Integer.valueOf("10"), converter.getInteger("DEPTNO"));
@@ -53,9 +53,9 @@ public class SomeEntitiesTest {
 
 		misc.JOB = "bar_job";
 
-		dao.update("EMP", e, d, misc);
+		client.update("EMP", e, d, misc);
 
-		result = dao.selectOneMap("select * from EMP where EMPNO = 100").get();
+		result = client.selectOneMap("select * from EMP where EMPNO = 100").get();
 		converter = new TypeConverter(result);
 		assertEquals(Integer.valueOf("1"), converter.getInteger("COMM"));
 		assertEquals(Integer.valueOf("10"), converter.getInteger("DEPTNO"));
@@ -69,7 +69,7 @@ public class SomeEntitiesTest {
 
 		Dept dept = new Dept();
 		dept.DEPTNO= "99";
-		dao.insert(dept);
+		client.insert(dept);
 	}
 
 	public static class Emp {

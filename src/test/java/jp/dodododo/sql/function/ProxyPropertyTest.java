@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
@@ -31,9 +32,9 @@ public class ProxyPropertyTest {
 
 	@Test
 	public void testInsertAndSelect() {
-		Dao dao = newTestClient(dbTestExtension.getDataSource());
-		DeptProxy.dao = dao;
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		SamuraiSqlClient client = newTestClient(dbTestExtension.getDataSource());
+		DeptProxy.client = client;
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
 		Emp emp = new Emp();
 		emp.dept = new Dept();
@@ -44,13 +45,13 @@ public class ProxyPropertyTest {
 		emp.TSTAMP = null;
 		emp.TSTAMP = new Date();
 		emp.NAME = "ename";
-		dao.insert("emp", emp);
-		// dao.insert(emp.dept);
+		client.insert("emp", emp);
+		// client.insert(emp.dept);
 		String empNo = emp.EMPNO;
 
 		String sql = "select EMPNO, EMP.DEPTNO as DEPTNO,COMM, ENAME, TSTAMP from EMP, DEPT where EMP.deptno = DEPT.deptno and empno = "
 				+ empNo + " order by EMPNO";
-		List<Emp> select = dao.select(sql, Emp.class);
+		List<Emp> select = client.select(sql, Emp.class);
 		assertEquals(empNo, select.get(0).EMPNO);
 		assertEquals(Integer.valueOf(2), TypeConverter.convert(select.get(0).COMM, Integer.class));
 		assertEquals("ename", select.get(0).NAME);
@@ -93,7 +94,7 @@ public class ProxyPropertyTest {
 	}
 
 	public static class DeptProxy extends Dept implements LazyLoadingProxy<Dept> {
-		private static Dao dao;
+		private static SamuraiSqlClient client;
 
 		@Column("deptNO")
 		public String DEPTNO;
@@ -106,7 +107,7 @@ public class ProxyPropertyTest {
 
 	    @Override
 		public Dept lazyLoad() {
-			return DeptProxy.dao.selectOne("select * from DEPT where deptno = " + DEPTNO, Dept.class).orElse(null);
+			return DeptProxy.client.selectOne("select * from DEPT where deptno = " + DEPTNO, Dept.class).orElse(null);
 		}
 
 	    @Override

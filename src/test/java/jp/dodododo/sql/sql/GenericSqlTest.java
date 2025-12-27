@@ -12,7 +12,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.dialect.Dialect;
 import jp.dodododo.sql.dialect.DialectManager;
 import jp.dodododo.sql.dialect.sqlite.SQLite;
@@ -28,7 +28,7 @@ public class GenericSqlTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testGetSql_ALL() {
@@ -146,21 +146,21 @@ public class GenericSqlTest {
 		if (DialectManager.getDialect(getDataSource()).isSupportMultiRowInsert() == false) {
 			return;
 		}
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		int beforeCount = dao.select(SIMPLE_COUNT_WHERE, args(TABLE_NAME, "emp"), Integer.class).get(0);
+		int beforeCount = client.select(SIMPLE_COUNT_WHERE, args(TABLE_NAME, "emp"), Integer.class).get(0);
 
 		List<Map<String, Object>> objects = new ArrayList<Map<String, Object>>();
 		objects.add(map("EMPNO", 1, "ENAME", null));
 		objects.add(map("EMPNO", 2, "ENAME", "ROD"));
-		int count = dao.execute(GenericSql.INSERT_BATCH, into("emp"), values(objects));
+		int count = client.execute(GenericSql.INSERT_BATCH, into("emp"), values(objects));
 		assertEquals(2, count);
 
-		int afterCount = dao.select(SIMPLE_COUNT_WHERE, args(TABLE_NAME, "emp"), Integer.class).get(0);
+		int afterCount = client.select(SIMPLE_COUNT_WHERE, args(TABLE_NAME, "emp"), Integer.class).get(0);
 
 		assertEquals(beforeCount + 2, afterCount);
-		Emp one = dao.selectOne(SIMPLE_WHERE, new Emp("1", null)).get();
-		Emp two = dao.selectOne(SIMPLE_WHERE, new Emp("2", null)).get();
+		Emp one = client.selectOne(SIMPLE_WHERE, new Emp("1", null)).get();
+		Emp two = client.selectOne(SIMPLE_WHERE, new Emp("2", null)).get();
 		assertNull(one.getENAME());
 		assertEquals("ROD", two.getENAME());
 	}
@@ -170,21 +170,21 @@ public class GenericSqlTest {
 		if (DialectManager.getDialect(getDataSource()).isSupportMultiRowInsert() == false) {
 			return;
 		}
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		int beforeCount = dao.select(SIMPLE_COUNT_WHERE, args(TABLE_NAME, "emp"), Integer.class).get(0);
+		int beforeCount = client.select(SIMPLE_COUNT_WHERE, args(TABLE_NAME, "emp"), Integer.class).get(0);
 
 		List<Emp> beans = new ArrayList<Emp>();
 		beans.add(new Emp("1", null));
 		beans.add(new Emp("2", "ROD"));
-		int count = dao.execute(GenericSql.INSERT_BATCH, into("emp"), values(beans));
+		int count = client.execute(GenericSql.INSERT_BATCH, into("emp"), values(beans));
 		assertEquals(2, count);
 
-		int afterCount = dao.select(SIMPLE_COUNT_WHERE, args(TABLE_NAME, "emp"), Integer.class).get(0);
+		int afterCount = client.select(SIMPLE_COUNT_WHERE, args(TABLE_NAME, "emp"), Integer.class).get(0);
 
 		assertEquals(beforeCount + 2, afterCount);
-		Emp one = dao.selectOne(SIMPLE_WHERE, new Emp("1", null)).get();
-		Emp two = dao.selectOne(SIMPLE_WHERE, new Emp("2", null)).get();
+		Emp one = client.selectOne(SIMPLE_WHERE, new Emp("1", null)).get();
+		Emp two = client.selectOne(SIMPLE_WHERE, new Emp("2", null)).get();
 		assertNull(one.getENAME());
 		assertEquals("ROD", two.getENAME());
 	}

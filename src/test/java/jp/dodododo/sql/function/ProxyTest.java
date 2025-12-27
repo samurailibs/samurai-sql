@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Date;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.access.AccessMode;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
@@ -31,13 +31,13 @@ public class ProxyTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(dbTestExtension.getDataSource());
-		DeptProxy.dao = dao;
-		SqlLogRegistry logRegistry = dao.getSqlLogRegistry();
+		client = newTestClient(dbTestExtension.getDataSource());
+		DeptProxy.client = client;
+		SqlLogRegistry logRegistry = client.getSqlLogRegistry();
 
 		Emp emp = new Emp();
 		emp.dept = new Dept();
@@ -48,12 +48,12 @@ public class ProxyTest {
 		emp.TSTAMP = null;
 		emp.TSTAMP = new Date();
 		emp.NAME = "ename";
-		dao.insert("emp", emp);
-		// dao.insert(emp.dept);
+		client.insert("emp", emp);
+		// client.insert(emp.dept);
 		String empNo = emp.EMPNO;
 
 		String sql = "select DEPT.deptno as DEPTNO, ename, comm, tstamp, EMPNO from EMP, DEPT where EMP.deptno = DEPT.deptno and empno = " + empNo;
-		List<Emp> select = dao.select(sql, Emp.class);
+		List<Emp> select = client.select(sql, Emp.class);
 		assertEquals(empNo, select.get(0).EMPNO);
 		assertEquals(Integer.valueOf(2), TypeConverter.convert(select.get(0).COMM, Integer.class));
 		assertEquals("ename", select.get(0).NAME);
@@ -99,7 +99,7 @@ public class ProxyTest {
 	}
 
 	public static class DeptProxy extends Dept implements LazyLoadingProxy<Dept> {
-		private static Dao dao;
+		private static SamuraiSqlClient client;
 
 		@Column("deptNO")
 		public String DEPTNO;
@@ -112,7 +112,7 @@ public class ProxyTest {
 
 	    @Override
 		public Dept lazyLoad() {
-			return DeptProxy.dao.selectOne("select * from DEPT where deptno =" + DEPTNO, Dept.class).get();
+			return DeptProxy.client.selectOne("select * from DEPT where deptno =" + DEPTNO, Dept.class).get();
 		}
 
 	    @Override

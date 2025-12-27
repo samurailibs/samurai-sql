@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Date;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Arg;
 import jp.dodododo.sql.annotation.Column;
 import jp.dodododo.sql.annotation.Id;
@@ -26,11 +26,11 @@ public class ArgAnnotationTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
 		Emp emp = new Emp();
 		emp.dept = new Dept();
@@ -41,11 +41,11 @@ public class ArgAnnotationTest {
 		emp.TSTAMP = null;
 		emp.TSTAMP = new Date();
 		emp.NAME = "ename";
-		dao.insert("emp", emp);
-		// dao.insert(emp.dept);
+		client.insert("emp", emp);
+		// client.insert(emp.dept);
 		String empNo = emp.EMPNO;
 
-		List<Emp> select = dao.select("select DEPT.deptno as DEPTNO from EMP, DEPT where EMP.deptno = DEPT.deptno and empno = " + empNo,
+		List<Emp> select = client.select("select DEPT.deptno as DEPTNO from EMP, DEPT where EMP.deptno = DEPT.deptno and empno = " + empNo,
 				args("dept", new Dept2("123"), "job", "argJob", "MGR", new StringBuilder("argMGR"), "null", null, "dept4", ""), Emp.class);
 
 		emp = select.get(0);

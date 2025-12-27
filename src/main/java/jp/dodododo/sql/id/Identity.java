@@ -6,10 +6,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import jp.dodododo.sql.Dao;
 import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.dialect.Dialect;
-import jp.dodododo.sql.impl.RdbDao;
 import jp.dodododo.sql.impl.SamuraiSqlClientImpl;
 
 public enum Identity implements IdGenerator {

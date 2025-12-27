@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.text.ParseException;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
 import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;
@@ -22,7 +21,7 @@ public class Issue35Test {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -31,19 +30,19 @@ public class Issue35Test {
 
 	@Test
 	public void test() throws ParseException {
-		dao = newTestClient(dbTestExtension.getDataSource());
+		client = newTestClient(dbTestExtension.getDataSource());
 
-		Emp emp = dao.selectOne("select * from EMP where empno = 7369", Emp.class).get();
+		Emp emp = client.selectOne("select * from EMP where empno = 7369", Emp.class).get();
 		assertNotNull(emp.dept);
 		assertNotNull(emp.dept2);
 		assertNotNull(emp.EMPNO);
 		assertNotNull(emp.ENAME);
 
-		emp = dao.selectOne("select empno, ename, 0 as DEPTNO from EMP where empno = 7369", Emp.class).get();
+		emp = client.selectOne("select empno, ename, 0 as DEPTNO from EMP where empno = 7369", Emp.class).get();
 		assertNotNull(emp.dept);
 		assertNotNull(emp.dept2);
 
-		emp = dao.selectOne("select empno, ename, null as DEPTNO from EMP where empno = 7369", Emp.class).get();
+		emp = client.selectOne("select empno, ename, null as DEPTNO from EMP where empno = 7369", Emp.class).get();
 		assertNull(emp.dept);
 		assertNotNull(emp.EMPNO);
 		assertNotNull(emp.ENAME);
@@ -95,23 +94,23 @@ public class Issue35Test {
 
 	@Test
 	public void testPrimitiveArgs() {
-		SamuraiSqlClient dao = newTestClient(dbTestExtension.getConnection());
-		List<PrimitiveArgsEmp> list = dao.select("select * from EMP where comm > 0", PrimitiveArgsEmp.class);
+		SamuraiSqlClient client = newTestClient(dbTestExtension.getConnection());
+		List<PrimitiveArgsEmp> list = client.select("select * from EMP where comm > 0", PrimitiveArgsEmp.class);
 		assertTrue(list.isEmpty() == false);
 		for (PrimitiveArgsEmp emp : list) {
 			assertTrue(0 < emp.comm);
 		}
-		list = dao.select("select * from EMP where comm is null", PrimitiveArgsEmp.class);
+		list = client.select("select * from EMP where comm is null", PrimitiveArgsEmp.class);
 		assertTrue(list.isEmpty() == false);
 		for (PrimitiveArgsEmp emp : list) {
 			assertTrue(0 == emp.comm);
 		}
-		List<ObjectArgsEmp> list2 = dao.select("select * from EMP where comm > 0", ObjectArgsEmp.class);
+		List<ObjectArgsEmp> list2 = client.select("select * from EMP where comm > 0", ObjectArgsEmp.class);
 		assertTrue(list.isEmpty() == false);
 		for (ObjectArgsEmp emp : list2) {
 			assertTrue(0 < emp.comm);
 		}
-		list2 = dao.select("select * from EMP where comm is null", ObjectArgsEmp.class);
+		list2 = client.select("select * from EMP where comm is null", ObjectArgsEmp.class);
 		assertTrue(list.isEmpty() == false);
 		for (ObjectArgsEmp emp : list2) {
 			assertNull(emp.comm);

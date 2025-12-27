@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import jp.dodododo.sql.Dao;
+import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.NumKey;
 import jp.dodododo.sql.exception.SQLRuntimeException;
 import jp.dodododo.sql.unit.DbTestExtension;
@@ -21,22 +21,22 @@ public class EnumInsertTest {
 	@RegisterExtension
 	static DbTestExtension dbTestExtension = new DbTestExtension();
 
-	private Dao dao;
+	private SamuraiSqlClient client;
 
 	@Test
 	public void testInsertAndSelect() {
-		dao = newTestClient(getDataSource());
+		client = newTestClient(getDataSource());
 
-		int count = dao.insert("emp", Emp.EMP);
+		int count = client.insert("emp", Emp.EMP);
 		assertEquals(1, count);
 
 		try {
-			count = dao.insert("emp", Emp.EMP);
+			count = client.insert("emp", Emp.EMP);
 			fail();
 		} catch (SQLRuntimeException success) {
 		}
 
-		List<Emp> result = dao.select("SELECT empno FROM EMP where empno=1", Emp.class);
+		List<Emp> result = client.select("SELECT empno FROM EMP where empno=1", Emp.class);
 		assertEquals(result.get(0).getClass(), Emp.class);
 		assertEquals(result.get(0).getId(), Emp.EMP.getId());
 	}
