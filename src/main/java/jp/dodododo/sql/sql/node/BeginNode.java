@@ -15,7 +15,9 @@ public class BeginNode extends ContainerNode {
 		super.accept(childCtx);
 		if (childCtx.isEnabled()) {
 			String sql = childCtx.getSql();
-			if (StringUtil.trimLine(sql).equalsIgnoreCase("where\n") == false && StringUtil.trimLine(sql).equalsIgnoreCase("where") == false) {
+			String trimmed = StringUtil.trimLine(sql);
+			if (trimmed.equalsIgnoreCase("where\n") == false &&
+					trimmed.equalsIgnoreCase("where") == false) {
 				ctx.addSql(sql, childCtx.getBindVariables(), childCtx.getBindVariableTypes());
 			}
 		}

@@ -19,10 +19,6 @@ import java.util.function.Consumer;
 public interface SamuraiSqlClient {
     SqlLogRegistry getSqlLogRegistry();
 
-    void setQueryTimeout(int seconds);
-
-    SqlConfig getConfig();
-
     <ROW> List<ROW> select(Class<ROW> returnType, Object... args);
 
     <ROW> Optional<ROW> selectOne(Class<ROW> returnType, Object... args);

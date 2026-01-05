@@ -4,15 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import jp.dodododo.sql.annotation.Column;
-import jp.dodododo.sql.impl.RdbDao;
+import jp.dodododo.sql.mapping.EntityIntrospector;
 import jp.dodododo.sql.unit.DbTestExtension;
 
 import org.junit.jupiter.api.Test;
@@ -74,45 +69,25 @@ public class CandidateValueTest {
 	@Test
 	public void test() throws Exception {
 		Sub child = new Sub();
-		Client client = new Client(getConnection());
 		List<CandidateValue> values = new ArrayList<CandidateValue>();
 		StringBuilder path = new StringBuilder();
-		Map<Integer, Object> processedObjects = new HashMap<Integer, Object>();
-		client.gatherValue(child, "aaa", "order_date", values, path, processedObjects);
+		Map<Object, Object> processedObjects = new IdentityHashMap<>();
+		new EntityIntrospector(null).gatherValue(child, "aaa", "order_date", values, path, processedObjects);
 
 		Object value = CandidateValue.getValue(values, null, null).value.getValue();
 		assertTrue( value instanceof Date);
 
 		child.d = null;
-		values = new ArrayList<CandidateValue>();
+		values = new ArrayList<>();
 		path = new StringBuilder();
-		processedObjects = new HashMap<Integer, Object>();
-		client.gatherValue(child, "aaa", "order_date", values, path, processedObjects);
+		processedObjects = new IdentityHashMap<>();
+		new EntityIntrospector(null).gatherValue(child, "aaa", "order_date", values, path, processedObjects);
 		value = CandidateValue.getValue(values, null, null).value.getValue();
 		assertNull(value);
 	}
 
 	private Connection getConnection() throws SQLException {
 		return dbTestExtension.getConnection();
-	}
-
-	public static class Client extends RdbDao {
-
-
-
-		public Client() {
-			super();
-		}
-
-		public Client(Connection connection) {
-			super(connection);
-		}
-
-		@Override
-		public void gatherValue(Object entity, String tableName, String columnName, List<CandidateValue> values, StringBuilder path, Map<Integer, Object> processedObjects) {
-			super.gatherValue(entity, tableName, columnName, values, path, processedObjects);
-		}
-
 	}
 
 	public static class Super {

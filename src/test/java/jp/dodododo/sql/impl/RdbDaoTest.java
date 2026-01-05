@@ -40,6 +40,7 @@ import jp.dodododo.sql.exception.SQLRuntimeException;
 import jp.dodododo.sql.id.EntityId;
 import jp.dodododo.sql.impl.EmpConstructorHasBeanAnnotatedDept.TestDept;
 import jp.dodododo.sql.log.SqlLogRegistry;
+import jp.dodododo.sql.mapping.EntityIntrospector;
 import jp.dodododo.sql.metadata.TableMetaData;
 import jp.dodododo.sql.paging.LimitOffset;
 import jp.dodododo.sql.paging.Paging;
@@ -1122,7 +1123,7 @@ public class RdbDaoTest {
 		String tableName = "test_table";
 		String columnName = "test_column";
 		List<CandidateValue> values = new ArrayList<CandidateValue>();
-		new RdbDao().gatherValue(new Object[] { bean }, tableName, columnName, values);
+		new EntityIntrospector(null).gatherValue(new Object[] { bean }, tableName, columnName, values);
 		assertEquals(1, values.size());
 		assertEquals("val", values.get(0).value.getValue());
 		assertTrue(values.get(0).matchTableName);
@@ -1130,7 +1131,7 @@ public class RdbDaoTest {
 		tableName = "test_table2";
 		columnName = "test_column2";
 		values = new ArrayList<CandidateValue>();
-		new RdbDao().gatherValue(new Object[] { bean }, tableName, columnName, values);
+		new EntityIntrospector(null).gatherValue(new Object[] { bean }, tableName, columnName, values);
 		assertEquals(1, values.size());
 		assertEquals("val2", values.get(0).value.getValue());
 		assertTrue(values.get(0).matchTableName);
@@ -1138,7 +1139,7 @@ public class RdbDaoTest {
 		tableName = "test_table3";
 		columnName = "test_column3";
 		values = new ArrayList<CandidateValue>();
-		new RdbDao(getDataSource()).gatherValue(new Object[] { bean }, tableName, columnName, values);
+		new EntityIntrospector(null).gatherValue(new Object[] { bean }, tableName, columnName, values);
 		assertEquals(5, values.size());
 		assertEquals("val3", values.get(0).value.getValue());
 		assertTrue(values.get(0).matchTableName);
@@ -1152,7 +1153,7 @@ public class RdbDaoTest {
 		String tableName = "test_table";
 		String columnName = "test_column";
 		List<CandidateValue> values = new ArrayList<>();
-		new RdbDao().gatherValue(new Object[] { bean }, tableName, columnName, values);
+		new EntityIntrospector(null).gatherValue(new Object[] { bean }, tableName, columnName, values);
 		assertEquals(0, values.size());
 	}
 
@@ -1229,7 +1230,7 @@ public class RdbDaoTest {
 	public void testGatherValue2() throws Exception {
 		C c = new C();
 		List<CandidateValue> values = new ArrayList<CandidateValue>();
-		new _Dao(getConnection()).gatherValue(new Object[] { c }, "B", "a", values);
+		new EntityIntrospector(null).gatherValue(new Object[] { c }, "B", "a", values);
 		CandidateValue value = CandidateValue.getValue(values, null, null);
 		assertEquals(0, value.value.getValue());
 	}
@@ -1333,21 +1334,6 @@ public class RdbDaoTest {
 					assertEquals(emp.dept().getDEPTNO(), e.dept().getDEPTNO());
 				},
 				IllegalStateException::new);
-	}
-	public class _Dao extends RdbDao {
-		public _Dao() {
-			super();
-		}
-
-		public _Dao(Connection connection) {
-			super(connection);
-		}
-
-		@Override
-		public void gatherValue(Object entity, String tableName, String columnName, List<CandidateValue> values, StringBuilder path, Map<Integer, Object> processedObjects) {
-			super.gatherValue(entity, tableName, columnName, values, path, processedObjects);
-		}
-
 	}
 
 	public static class A {

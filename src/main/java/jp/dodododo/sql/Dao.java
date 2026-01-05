@@ -10,8 +10,4 @@ import jp.dodododo.sql.log.SqlLogRegistry;
 @Deprecated
 public interface Dao extends SelectDao, ExecuteUpdateDao, SamuraiSqlClient {
 	SqlLogRegistry getSqlLogRegistry();
-
-	void setQueryTimeout(int seconds);
-
-	SqlConfig getConfig();
 }

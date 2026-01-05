@@ -20,7 +20,7 @@ import jp.dodododo.sql.commons.Null;
 import jp.dodododo.sql.exception.InstantiationRuntimeException;
 import jp.dodododo.sql.exception.NoParameterizedException;
 import jp.dodododo.sql.id.EntityId;
-import jp.dodododo.sql.impl.EmptyIterationCallback;
+import jp.dodododo.sql.callback.EmptyIterationCallback;
 import jp.dodododo.sql.lazyloading.LazyLoadingUtil;
 import jp.dodododo.sql.lazyloading.ProxyFactory;
 import jp.dodododo.sql.message.Message;
@@ -145,14 +145,19 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 			useCache = false;
 			propertyDescs = new ArrayList<>(objectDesc.getReadablePropertyDescs());
 		}
-		for (int i = 0; i < propertyDescs.size(); i++) {
-			PropertyDesc propertyDesc = propertyDescs.get(i);
-			if (useCache == false && isForRelProperty(propertyDesc) == false) {
-				propertyDescs.remove(i);
-				i--;
-				continue;
-			}
-			setRelationValues(rs, resultSetColumnList, propertyDesc, row);
+		final boolean useC = useCache;
+		propertyDescs.removeIf(pd -> !useC && !isForRelProperty(pd));
+//		for (int i = 0; i < propertyDescs.size(); i++) {
+//			PropertyDesc propertyDesc = propertyDescs.get(i);
+//			if (useCache == false && isForRelProperty(propertyDesc) == false) {
+//				propertyDescs.remove(i);
+//				i--;
+//				continue;
+//			}
+//			setRelationValues(rs, resultSetColumnList, propertyDesc, row);
+//		}
+		for (PropertyDesc pd : propertyDescs) {
+			setRelationValues(rs, resultSetColumnList, pd, row);
 		}
 		if (useCache == false) {
 			FOR_REL_PROPERTY_DESC_CACHE.put(beanClass, propertyDescs);
@@ -902,8 +907,8 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 		if (row == null) {
 			return new StringBuilderWrapper(new StringBuilder());
 		}
-		int hashCode = System.identityHashCode(row);
-		StringBuilder builder = this.rowDataCaches.get(hashCode);
+		Integer key = System.identityHashCode(row);
+		StringBuilder builder = this.rowDataCaches.get(key);
 		if (builder == null) {
 			return new StringBuilderWrapper(new StringBuilder());
 		}
@@ -944,11 +949,20 @@ public class BeanResultSetHandler<T> extends AbstractResultSetHandler<T> {
 			if (0 < length) {
 				ret = length + builder.charAt(0);
 			}
+			if (8 < length) {
+				ret = ret + builder.charAt(8)*8;
+			}
+			if (16 < length) {
+				ret = ret + builder.charAt(16)*16;
+			}
 			if (32 < length) {
-				ret = length + builder.charAt(32);
+				ret = ret + builder.charAt(32)*32;
+			}
+			if (64 < length) {
+				ret = ret + builder.charAt(64)*64;
 			}
 			if (128 < length) {
-				ret = length + builder.charAt(128);
+				ret = ret + builder.charAt(128)*128;
 			}
 			return ret;
 		}

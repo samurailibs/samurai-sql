@@ -18,14 +18,6 @@ import org.slf4j.LoggerFactory;
 
 public class UnitTestUtil {
 
-	public static SamuraiSqlClient newTestClient() {
-		Class<?>[] interfaces = new Class[] { SamuraiSqlClient.class };
-		InvocationHandler handler = new Handler(new SamuraiSqlClientImpl());
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		SamuraiSqlClient client = (SamuraiSqlClient) Proxy.newProxyInstance(loader, interfaces, handler);
-		return client;
-	}
-
 	public static SamuraiSqlClient newTestClient(DataSource dataSource) {
 		Class<?>[] interfaces = new Class[] { SamuraiSqlClient.class };
 		InvocationHandler handler = new Handler(new SamuraiSqlClientImpl(dataSource));

@@ -1,10 +1,6 @@
 package jp.dodododo.sql.util;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Ignore UpperCase,LowerCase,CamelCase and SnakeCase.
@@ -98,13 +94,76 @@ public class CaseInsensitiveMap<V> extends HashMap<String, V> {
 
 	}
 
+//	@Override
+//	public Set<Entry<String, V>> entrySet() {
+//		Map<String, V> tmp = new HashMap<>();
+//		tmp.putAll(decamelize);
+//		tmp.putAll(camelize);
+//		tmp.putAll(original);
+//		return tmp.entrySet();
+//	}
 	@Override
 	public Set<Entry<String, V>> entrySet() {
-		Map<String, V> tmp = new HashMap<>();
-		tmp.putAll(decamelize);
-		tmp.putAll(camelize);
-		tmp.putAll(original);
-		return tmp.entrySet();
+		return new AbstractSet<>() {
+			@Override
+			public Iterator<Entry<String, V>> iterator() {
+				Set<String> seen = new HashSet<>();
+
+				Iterator<Entry<String, V>> it1 = original.entrySet().iterator();
+				Iterator<Entry<String, V>> it2 = camelize.entrySet().iterator();
+				Iterator<Entry<String, V>> it3 = decamelize.entrySet().iterator();
+
+				return new Iterator<>() {
+					Entry<String, V> next;
+
+					private void advance() {
+						while (it1.hasNext()) {
+							Entry<String, V> e = it1.next();
+							if (seen.add(e.getKey())) {
+								next = e;
+								return;
+							}
+						}
+						while (it2.hasNext()) {
+							Entry<String, V> e = it2.next();
+							if (seen.add(e.getKey())) {
+								next = e;
+								return;
+							}
+						}
+						while (it3.hasNext()) {
+							Entry<String, V> e = it3.next();
+							if (seen.add(e.getKey())) {
+								next = e;
+								return;
+							}
+						}
+						next = null;
+					}
+
+					@Override
+					public boolean hasNext() {
+						if (next == null) {
+							advance();
+						}
+						return next != null;
+					}
+
+					@Override
+					public Entry<String, V> next() {
+						if (!hasNext()) throw new NoSuchElementException();
+						Entry<String, V> e = next;
+						next = null;
+						return e;
+					}
+				};
+			}
+
+			@Override
+			public int size() {
+				return keySet().size();
+			}
+		};
 	}
 
 	@Override
@@ -162,9 +221,11 @@ public class CaseInsensitiveMap<V> extends HashMap<String, V> {
 
 	@Override
 	public V put(String key, V val) {
+		String camelizedKey = StringUtil.camelize(key);
+		String decamelizedKey = StringUtil.decamelize(key);
 		original.put(key, val);
-		camelize.put(StringUtil.camelize(key), val);
-		return decamelize.put(StringUtil.decamelize(key), val);
+		camelize.put(camelizedKey, val);
+		return decamelize.put(decamelizedKey, val);
 	}
 
 	@Override

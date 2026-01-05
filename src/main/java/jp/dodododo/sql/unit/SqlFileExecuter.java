@@ -8,7 +8,7 @@ import java.util.Map;
 import jp.dodododo.sql.IterationCallback;
 import jp.dodododo.sql.handler.ResultSetHandler;
 import jp.dodododo.sql.handler.impl.MapResultSetHandler;
-import jp.dodododo.sql.impl.EmptyIterationCallback;
+import jp.dodododo.sql.callback.EmptyIterationCallback;
 import jp.dodododo.sql.impl.SamuraiSqlClientImpl;
 import jp.dodododo.sql.util.SqlUtil;
 import jp.dodododo.sql.value.ParameterValue;

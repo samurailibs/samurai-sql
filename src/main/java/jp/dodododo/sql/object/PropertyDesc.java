@@ -3,12 +3,7 @@ package jp.dodododo.sql.object;
 import static jp.dodododo.janerics.GenericsTypeUtil.*;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -567,7 +562,7 @@ public class PropertyDesc implements AnnotatedElement {
 			if (field != null) {
 				ret.addAll(Arrays.asList(field.getDeclaredAnnotations()));
 			}
-			return ret.toArray(new Annotation[ret.size()]);
+			return ret.toArray(new Annotation[0]);
 		}
 
 	    @Override
@@ -591,7 +586,16 @@ public class PropertyDesc implements AnnotatedElement {
 		}
 		@Override
 		public <T extends Annotation> T[] getDeclaredAnnotationsByType(Class<T> annotationClass) {
-	        return getAnnotationsByType(annotationClass);
+			Annotation[] declaredAnnotations = getDeclaredAnnotations();
+			List<T> results = new ArrayList<>();
+			for (Annotation a : declaredAnnotations) {
+				if (annotationClass.isInstance(a)) {
+					results.add(annotationClass.cast(a));
+				}
+			}
+
+			T[] out = (T[]) Array.newInstance(annotationClass, results.size());
+			return results.toArray(out);
 		}
 		@Override
 		public <T extends Annotation> T getDeclaredAnnotation(Class<T> annotationClass) {
@@ -599,7 +603,11 @@ public class PropertyDesc implements AnnotatedElement {
 		}
 		@Override
 		public <T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass) {
-			return null; // TODO impl
+			T[] result = getDeclaredAnnotationsByType(annotationClass);
+			if (result.length > 0) {
+				return result;
+			}
+			return (T[]) Array.newInstance(annotationClass, 0);
 		}
 	}
 

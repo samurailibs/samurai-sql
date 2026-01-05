@@ -1,4 +1,4 @@
-package jp.dodododo.sql.impl;
+package jp.dodododo.sql.callback;
 
 import java.util.List;
 
