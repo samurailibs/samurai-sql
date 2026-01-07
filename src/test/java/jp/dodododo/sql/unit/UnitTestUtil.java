@@ -22,16 +22,14 @@ public class UnitTestUtil {
 		Class<?>[] interfaces = new Class[] { SamuraiSqlClient.class };
 		InvocationHandler handler = new Handler(new SamuraiSqlClientImpl(dataSource));
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		SamuraiSqlClient client = (SamuraiSqlClient) Proxy.newProxyInstance(loader, interfaces, handler);
-		return client;
+		return (SamuraiSqlClient) Proxy.newProxyInstance(loader, interfaces, handler);
 	}
 
 	public static SamuraiSqlClient newTestClient(Connection connection) {
 		Class<?>[] interfaces = new Class[] { SamuraiSqlClient.class };
 		InvocationHandler handler = new Handler(new SamuraiSqlClientImpl(connection));
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		SamuraiSqlClient client = (SamuraiSqlClient) Proxy.newProxyInstance(loader, interfaces, handler);
-		return client;
+		return (SamuraiSqlClient) Proxy.newProxyInstance(loader, interfaces, handler);
 	}
 
 	public static class Handler implements InvocationHandler {

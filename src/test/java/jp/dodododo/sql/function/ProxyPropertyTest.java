@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Date;
 import java.util.List;
 
-import jp.dodododo.sql.Dao;
 import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.annotation.Bean;
 import jp.dodododo.sql.annotation.Column;

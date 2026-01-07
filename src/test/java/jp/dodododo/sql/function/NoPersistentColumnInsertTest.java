@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Date;
 
 import jp.dodododo.sql.exception.SQLRuntimeException;
-import jp.dodododo.sql.impl.RdbDao;
 import jp.dodododo.sql.impl.SamuraiSqlClientImpl;
 import jp.dodododo.sql.unit.DbTestExtension;
 
@@ -23,7 +22,7 @@ public class NoPersistentColumnInsertTest {
 
 	@Test
 	public void testInsertAndSelect() {
-		client = new RdbDao(dbTestExtension.getDataSource());
+		client = new SamuraiSqlClientImpl(dbTestExtension.getDataSource());
 
 		int count = client.insert("emp", Emp.EMP, npc("ename", "COMM", "deptNo", "HIREDATE", "MGR", "SAL", "TSTAMP", "JOB"));
 		assertEquals(1, count);

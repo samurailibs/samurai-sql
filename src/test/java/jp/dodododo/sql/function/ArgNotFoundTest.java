@@ -4,7 +4,6 @@ import static jp.dodododo.sql.unit.UnitTestUtil.*;
 import static jp.dodododo.sql.util.SqlUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import jp.dodododo.sql.Dao;
 import jp.dodododo.sql.SamuraiSqlClient;
 import jp.dodododo.sql.exception.ArgNotFoundException;
 import jp.dodododo.sql.unit.DbTestExtension;
