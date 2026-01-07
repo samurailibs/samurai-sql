@@ -33,14 +33,11 @@ public class PreparedStatementFactory {
 
     protected SqlConfig config;
 
-    protected int queryTimeout;
-
-    public PreparedStatementFactory(SqlNodeCache sqlNodeCache, SqlLogger sqlLogger, SqlLogRegistry sqlLogRegistry, SqlConfig config, int queryTimeout) {
+    public PreparedStatementFactory(SqlNodeCache sqlNodeCache, SqlLogger sqlLogger, SqlLogRegistry sqlLogRegistry, SqlConfig config) {
         this.sqlNodeCache = sqlNodeCache;
         this.sqlLogger = sqlLogger;
         this.sqlLogRegistry= sqlLogRegistry;
         this.config = config;
-        this.queryTimeout = queryTimeout;
     }
 
     public PreparedStatement createPreparedStatement(Connection connection, ExecuteType executeType, Dialect dialect, CommandContext ctx, Node node) {
@@ -60,7 +57,7 @@ public class PreparedStatementFactory {
         } catch (SQLRuntimeException e) {
             throw new InvalidSQLException(sql, e);
         }
-        PreparedStatementUtil.setQueryTimeout(ps, queryTimeout);
+        PreparedStatementUtil.setQueryTimeout(ps, config.getQueryTimeout());
         ps = dialect.preparedStatement(ps);
         return ps;
     }

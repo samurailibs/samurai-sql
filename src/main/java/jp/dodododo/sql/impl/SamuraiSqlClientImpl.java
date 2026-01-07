@@ -34,9 +34,9 @@ import java.util.function.Consumer;
 public class SamuraiSqlClientImpl implements SamuraiSqlClient {
     protected static final Logger logger = LoggerFactory.getLogger(SamuraiSqlClientImpl.class);
 
-    protected ClientBootstrap clientBootstrap;
+    protected SqlEnvironment sqlEnvironment = new SqlEnvironment();
 
-    protected SqlEnvironment sqlEnvironment;
+    protected ClientBootstrap clientBootstrap = new ClientBootstrap(sqlEnvironment);
 
     protected PreparedStatementFactory statementFactory;
 
@@ -49,18 +49,6 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
     protected CrudExecutor crudExecutor;
 
     protected QueryExecutor queryExecutor;
-
-    {
-        this.sqlEnvironment = new SqlEnvironment();
-        this.clientBootstrap = new ClientBootstrap(sqlEnvironment);
-        this.statementFactory = new PreparedStatementFactory(
-                sqlEnvironment.sqlNodeCache(),
-                sqlEnvironment.sqlLogger(),
-                sqlEnvironment.sqlLogRegistry(),
-                sqlEnvironment.sqlConfig(),
-                sqlEnvironment.sqlConfig().getQueryTimeout()
-        );
-    }
 
     public SamuraiSqlClientImpl(Object obj) {
         if (obj instanceof String jndiName) {
@@ -93,6 +81,13 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
     protected void initAfterBootstrap() {
         this.metaDataService = new MetaDataService(clientBootstrap.connectionProvider());
         this.entityIntrospector = new EntityIntrospector(metaDataService);
+
+        this.statementFactory = new PreparedStatementFactory(
+                sqlEnvironment.sqlNodeCache(),
+                sqlEnvironment.sqlLogger(),
+                sqlEnvironment.sqlLogRegistry(),
+                sqlEnvironment.sqlConfig()
+        );
 
         this.crudExecutor = new CrudExecutor(
                 metaDataService,
