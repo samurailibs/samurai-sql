@@ -1,6 +1,7 @@
 package jp.dodododo.sql.sql.parse;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.regex.Pattern;
 
 import jp.dodododo.sql.exception.EndCommentNotFoundRuntimeException;
@@ -32,7 +33,7 @@ public class SqlParser {
 
 	protected SqlTokenizer tokenizer;
 
-	protected Stack<Node> nodeStack = new Stack<Node>();
+	protected Deque<Node> nodeStack = new ArrayDeque<>();
 
 	public SqlParser(String sql) {
 		String formattedSql = sql.trim();
@@ -243,11 +244,11 @@ public class SqlParser {
 	}
 
 	protected boolean isElseMode() {
-		for (int i = 0; i < nodeStack.size(); ++i) {
-			if (nodeStack.get(i) instanceof ElseNode) {
-				return true;
-			}
-		}
+        for (Node node : nodeStack) {
+            if (node instanceof ElseNode) {
+                return true;
+            }
+        }
 		return false;
 	}
 

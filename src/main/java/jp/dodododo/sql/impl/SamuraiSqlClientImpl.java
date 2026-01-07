@@ -114,10 +114,6 @@ public class SamuraiSqlClientImpl implements SamuraiSqlClient {
         );
     }
 
-    protected Connection getConnection() {
-        return clientBootstrap.connectionProvider().connection();
-    }
-
     @Override
     public int insert(String tableName, Object... entity) {
         return crudExecutor.insert(tableName, entity);
